@@ -1,0 +1,77 @@
+# Notes 09 — Power BI (Phase 9)
+
+**Files:** `powerbi/01_build_guide.md` (click-by-click), `powerbi/northstar_theme.json`,
+`screenshots/mockup_page*.png` (layout references)
+
+## In one line
+Power BI turns the star schema into an interactive dashboard that managers can filter and drill into themselves.
+
+## Simple explanation
+SQL answers one question at a time. Power BI lets a manager **click**: pick "North East" and every chart updates; click
+a category to drill to products. It has three parts:
+1. **Power Query**: load and shape the data.
+2. **Model**: tables + relationships + DAX measures (the "semantic model").
+3. **Report**: pages of visuals.
+
+## The 5 pages and who they're for
+| Page | Audience | Question it answers |
+| --- | --- | --- |
+| Executive Overview | CEO, CFO | How are we doing vs last year? |
+| Sales Performance | Head of Retail, E-commerce | Where does revenue come from? |
+| Profitability | CFO, category managers | Where is margin lost? (discounts, Electronics) |
+| Customer Analytics | Marketing, CRM | Who are our valuable customers? Are they staying? |
+| Returns | Customer service, buying team | What is returned, why, and from which supplier? |
+
+## Design principles used
+- **KPI cards at the top**, each with a comparison vs last year. A number without context means nothing.
+- **Trend left, breakdown right**; 4 visuals per page at most, so it isn't cluttered.
+- **Same slicers on every page** (sync slicers): Year, Quarter, Region, Channel, Category.
+- **Colour has meaning:** blue = normal, orange = attention. Red/amber/green only for status, always with a label too
+  (colour-blind safe palette in the theme file).
+- **No dual-axis charts:** two measures with different scales go in two charts.
+- **"Simulated data" footer** on every page.
+
+## Interactivity features (know what each does)
+| Feature | What | Why |
+| --- | --- | --- |
+| Slicers | Filter buttons/dropdowns | Self-service filtering |
+| Cross-filtering | Click a bar, other visuals filter | Explore relationships |
+| Drill-down | Year → Quarter → Month; Category → Sub-category → Product | Go from summary to detail |
+| Drill-through | Right-click a product → detail page | Deep dive on one item |
+| Tooltip pages | Mini report on hover | More info without clutter |
+| Bookmarks | Saved view, e.g. "reset filters" | Guided navigation |
+| Row-level security | Each store manager sees only their store | One report, safe for everyone |
+
+## Import vs DirectQuery
+- **Import** (used here): data copied into Power BI. Very fast, needs refresh. Best for this size.
+- **DirectQuery**: queries the database live. Always current, slower, DAX limitations. For very large or real-time data.
+
+## The most important step: reconcile
+Before designing visuals, check Power BI totals = SQL totals: Revenue £8,545,888 · GP £3,595,004 · Orders 89,528. If
+they don't match, a relationship or data type is wrong.
+
+## Interview questions
+
+**Q: Walk me through your dashboard.** Start from the user: *"The executive page answers 'how are we doing' in
+10 seconds. 2025 revenue is up 15.7%, but the margin card shows −2.4 points. The profitability page explains why:
+discounts and Electronics. The returns page shows the online spike traced to one supplier."* Tell a story, not a list of
+charts.
+
+**Q: How did you decide which visuals to use?** By the question: trends over time → line chart; comparing categories
+→ bar chart sorted by value; part of a whole with few parts → stacked bar; one number → card. I avoided pie charts with
+many slices and 3D charts.
+
+**Q: How would you make it faster?** Star schema, Import mode, remove unused columns, integer keys, measures instead of
+calculated columns, and check slow visuals with Performance Analyzer.
+
+**Q: How would you share it securely?** Publish to the Power BI Service in a workspace, share via an app, and add
+row-level security so store managers see only their store. Schedule refresh through a gateway for the PostgreSQL source.
+
+**Q: What would you add next?** An inventory page (stock-outs, overstock) once stock data exists, a forecast, and
+alerts on margin and return rate.
+
+## Common mistakes
+- Too many visuals on a page.
+- KPIs without a comparison (vs LY, vs target).
+- Totals that don't reconcile with finance.
+- Months sorted alphabetically (Apr, Aug, Dec…). Fix with *Sort by column*.
