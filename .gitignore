@@ -7,3 +7,6 @@ data/clean/*.csv
 data/quarantine/*.csv
 __pycache__/
 ~$*
+# Power BI local files (never commit)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

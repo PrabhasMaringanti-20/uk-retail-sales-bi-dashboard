@@ -1,5 +1,9 @@
 # Power BI — Step-by-step Build Guide (Phase 9)
 
+> **Shortcut:** a ready-made Power BI Project already exists: `powerbi/NorthStar_Retail_Dashboard.pbip`.
+> Simple instructions for opening it (and a beginner version of this guide) are in [`00_SIMPLE_STEPS.md`](00_SIMPLE_STEPS.md).
+> This file is the detailed reference for building everything by hand.
+
 Power BI Desktop is free and runs on Windows. This guide builds the full report from the clean data in about 4–6 hours.
 Layout references: `screenshots/mockup_page*.png` (Python mockups). **When finished, replace them with real screenshots
 of the report** and save the `.pbix` as `powerbi/NorthStar_Retail_Dashboard.pbix`.

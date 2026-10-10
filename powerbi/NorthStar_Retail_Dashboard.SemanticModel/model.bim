@@ -1,0 +1,1489 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-GB",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-GB",
+    "expressions": [
+      {
+        "name": "DataFolder",
+        "kind": "m",
+        "expression": [
+          "\"C:\\NorthStar\\uk-retail-sales-bi-dashboard\\data\\clean\\\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]"
+        ],
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "FactSales",
+        "columns": [
+          {
+            "name": "SalesLineKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesLineKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "OrderID",
+            "dataType": "string",
+            "sourceColumn": "OrderID"
+          },
+          {
+            "name": "OrderLineNumber",
+            "dataType": "int64",
+            "sourceColumn": "OrderLineNumber",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "sourceColumn": "DateKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "OrderDateTime",
+            "dataType": "dateTime",
+            "sourceColumn": "OrderDateTime",
+            "formatString": "dd/mm/yyyy hh:nn"
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "sourceColumn": "CustomerKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "StoreKey",
+            "dataType": "int64",
+            "sourceColumn": "StoreKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ChannelKey",
+            "dataType": "int64",
+            "sourceColumn": "ChannelKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "RegionKey",
+            "dataType": "int64",
+            "sourceColumn": "RegionKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "Quantity",
+            "dataType": "int64",
+            "sourceColumn": "Quantity",
+            "formatString": "0",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "decimal",
+            "sourceColumn": "UnitPrice",
+            "formatString": "£#,0.00",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "UnitCost",
+            "dataType": "decimal",
+            "sourceColumn": "UnitCost",
+            "formatString": "£#,0.00",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DiscountPct",
+            "dataType": "double",
+            "sourceColumn": "DiscountPct",
+            "formatString": "0.0%",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "GrossSales",
+            "dataType": "decimal",
+            "sourceColumn": "GrossSales",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "DiscountAmount",
+            "dataType": "decimal",
+            "sourceColumn": "DiscountAmount",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "NetSales",
+            "dataType": "decimal",
+            "sourceColumn": "NetSales",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "CostAmount",
+            "dataType": "decimal",
+            "sourceColumn": "CostAmount",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "GrossProfit",
+            "dataType": "decimal",
+            "sourceColumn": "GrossProfit",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "PaymentMethod",
+            "dataType": "string",
+            "sourceColumn": "PaymentMethod"
+          },
+          {
+            "name": "IsPriceImputed",
+            "dataType": "string",
+            "sourceColumn": "IsPriceImputed"
+          },
+          {
+            "type": "calculated",
+            "name": "Discount Band",
+            "dataType": "string",
+            "expression": "SWITCH ( TRUE (), FactSales[DiscountPct] = 0, \"1 None\", FactSales[DiscountPct] <= 0.15, \"2 5-15%\", FactSales[DiscountPct] <= 0.25, \"3 20-25%\", FactSales[DiscountPct] <= 0.35, \"4 30-35%\", \"5 40%+\" )"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactSales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_sales.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"SalesLineKey\", Int64.Type}, {\"OrderID\", type text}, {\"OrderLineNumber\", Int64.Type}, {\"DateKey\", Int64.Type}, {\"OrderDateTime\", type datetime}, {\"CustomerKey\", Int64.Type}, {\"ProductKey\", Int64.Type}, {\"StoreKey\", Int64.Type}, {\"ChannelKey\", Int64.Type}, {\"RegionKey\", Int64.Type}, {\"Quantity\", Int64.Type}, {\"UnitPrice\", Currency.Type}, {\"UnitCost\", Currency.Type}, {\"DiscountPct\", type number}, {\"GrossSales\", Currency.Type}, {\"DiscountAmount\", Currency.Type}, {\"NetSales\", Currency.Type}, {\"CostAmount\", Currency.Type}, {\"GrossProfit\", Currency.Type}, {\"PaymentMethod\", type text}, {\"IsPriceImputed\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Revenue",
+            "expression": [
+              "SUM ( FactSales[NetSales] )                                    // FY2025: £4,584,138"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Gross Sales",
+            "expression": [
+              "SUM ( FactSales[GrossSales] )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Discount Amount",
+            "expression": [
+              "SUM ( FactSales[DiscountAmount] )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Cost",
+            "expression": [
+              "SUM ( FactSales[CostAmount] )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Gross Profit",
+            "expression": [
+              "[Revenue] - [Cost]                                              // FY2025: £1,878,065"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Units Sold",
+            "expression": [
+              "SUM ( FactSales[Quantity] )"
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Gross Margin %",
+            "expression": [
+              "DIVIDE ( [Gross Profit], [Revenue] )                            // FY2025: 41.0%"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Discount Rate %",
+            "expression": [
+              "DIVIDE ( [Discount Amount], [Gross Sales] )                     // FY2025: 7.1%"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Orders",
+            "expression": [
+              "DISTINCTCOUNT ( FactSales[OrderID] )                            // FY2025: 46,889"
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Customers",
+            "expression": [
+              "// Known customers only: the Guest member (-1) is one \"customer\" for thousands of people",
+              "CALCULATE (",
+              "    DISTINCTCOUNT ( FactSales[CustomerKey] ),",
+              "    DimCustomer[IsGuest] = \"N\"",
+              ")                                                               // FY2025: 8,101"
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Customers"
+          },
+          {
+            "name": "Average Order Value",
+            "expression": [
+              "DIVIDE ( [Revenue], [Orders] )                                  // FY2025: £97.77"
+            ],
+            "formatString": "£#,0.00",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Units per Order",
+            "expression": [
+              "DIVIDE ( [Units Sold], [Orders] )"
+            ],
+            "formatString": "0.00",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Revenue per Customer",
+            "expression": [
+              "CALCULATE ( DIVIDE ( [Revenue], [Customers] ), DimCustomer[IsGuest] = \"N\" )"
+            ],
+            "formatString": "£#,0.00",
+            "displayFolder": "Customers"
+          },
+          {
+            "name": "Refund Amount",
+            "expression": [
+              "SUM ( FactReturns[RefundAmount] )                               // by RETURN date (active relationship)"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Returns"
+          },
+          {
+            "name": "Returned Units",
+            "expression": [
+              "SUM ( FactReturns[ReturnQty] )"
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Returns"
+          },
+          {
+            "name": "Return Rate %",
+            "expression": [
+              "// Refunds in the period / revenue in the period (both on their own active date)",
+              "DIVIDE ( [Refund Amount], [Revenue] )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Refunds by Order Date",
+            "expression": [
+              "// Switch FactReturns to its INACTIVE relationship (OrderDateKey) for this calculation only",
+              "CALCULATE (",
+              "    [Refund Amount],",
+              "    USERELATIONSHIP ( FactReturns[OrderDateKey], DimDate[DateKey] )",
+              ")"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Returns"
+          },
+          {
+            "name": "Return Rate % (Order Cohort)",
+            "expression": [
+              "// \"Of what we SOLD in this month, how much came back?\" - matches SQL Q16/Q39",
+              "DIVIDE ( [Refunds by Order Date], [Revenue] )                   // FY2025: 8.3%"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Gross Profit after Returns",
+            "expression": [
+              "// Assumes refunded goods are not resold (conservative, stated in the report)",
+              "[Gross Profit] - [Refunds by Order Date]"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Returns"
+          },
+          {
+            "name": "Margin after Returns %",
+            "expression": [
+              "DIVIDE ( [Gross Profit after Returns], [Revenue] )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue YTD",
+            "expression": [
+              "TOTALYTD ( [Revenue], DimDate[Date] )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Revenue PY",
+            "expression": [
+              "CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) )   // FY2025 context -> £3,961,750"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Revenue YoY %",
+            "expression": [
+              "VAR Curr = [Revenue]",
+              "VAR Prev = [Revenue PY]",
+              "RETURN",
+              "    IF ( NOT ISBLANK ( Prev ), DIVIDE ( Curr - Prev, Prev ) )   // FY2025: +15.7%"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Gross Profit PY",
+            "expression": [
+              "CALCULATE ( [Gross Profit], SAMEPERIODLASTYEAR ( DimDate[Date] ) )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Gross Profit YoY %",
+            "expression": [
+              "DIVIDE ( [Gross Profit] - [Gross Profit PY], [Gross Profit PY] )   // FY2025: +9.4%"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Gross Margin % PY",
+            "expression": [
+              "CALCULATE ( [Gross Margin %], SAMEPERIODLASTYEAR ( DimDate[Date] ) )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Gross Margin Change (pts)",
+            "expression": [
+              "// Margin is a percentage, so the change is in POINTS (41.0% - 43.3% = -2.4 pts), not a %",
+              "( [Gross Margin %] - [Gross Margin % PY] ) * 100"
+            ],
+            "formatString": "+0.0;-0.0;0.0",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue PM",
+            "expression": [
+              "CALCULATE ( [Revenue], DATEADD ( DimDate[Date], -1, MONTH ) )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Revenue MoM %",
+            "expression": [
+              "DIVIDE ( [Revenue] - [Revenue PM], [Revenue PM] )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue Running Total",
+            "expression": [
+              "// Running total across ALL dates up to the last visible date (does not reset each year)",
+              "VAR LastDate = MAX ( DimDate[Date] )",
+              "RETURN",
+              "    CALCULATE (",
+              "        [Revenue],",
+              "        FILTER ( ALL ( DimDate[Date] ), DimDate[Date] <= LastDate )",
+              "    )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Revenue 3M Moving Avg",
+            "expression": [
+              "CALCULATE (",
+              "    [Revenue] / 3,",
+              "    DATESINPERIOD ( DimDate[Date], MAX ( DimDate[Date] ), -3, MONTH )",
+              ")"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Revenue % of Total",
+            "expression": [
+              "// ALL removes the filter from the product table, so the denominator is the grand total",
+              "DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( DimProduct ) ) )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue % of Channel Total",
+            "expression": [
+              "DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( DimChannel ) ) )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Company Margin %",
+            "expression": [
+              "// Benchmark line for \"store vs company\" visuals",
+              "CALCULATE ( [Gross Margin %], ALL ( DimStore ) )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Margin vs Company (pts)",
+            "expression": [
+              "( [Gross Margin %] - [Company Margin %] ) * 100"
+            ],
+            "formatString": "+0.0;-0.0;0.0",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue (Physical Stores)",
+            "expression": [
+              "// Excludes the E-commerce Hub so store league tables compare like with like",
+              "CALCULATE ( [Revenue], DimStore[IsOnline] = \"N\" )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Gross Margin % (Physical Stores)",
+            "expression": [
+              "CALCULATE ( [Gross Margin %], DimStore[IsOnline] = \"N\" )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Revenue (SUMX check)",
+            "expression": [
+              "// Same result as [Revenue], but recalculated row by row from price, quantity and discount.",
+              "// Used to prove the stored NetSales column is right.",
+              "SUMX (",
+              "    FactSales,",
+              "    FactSales[Quantity] * FactSales[UnitPrice] * ( 1 - FactSales[DiscountPct] )",
+              ")"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Profit Lost Below Cost",
+            "expression": [
+              "// Only order lines sold for less than they cost",
+              "-SUMX (",
+              "    FILTER ( FactSales, FactSales[GrossProfit] < 0 ),",
+              "    FactSales[GrossProfit]",
+              ")                                                               // FY2025: ~£26K"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Deep Discount Revenue",
+            "expression": [
+              "CALCULATE ( [Revenue], FactSales[DiscountPct] >= 0.30 )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Deep Discount Margin %",
+            "expression": [
+              "CALCULATE ( [Gross Margin %], FactSales[DiscountPct] >= 0.30 )"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "New Customers",
+            "expression": [
+              ""
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Customers"
+          },
+          {
+            "name": "VAR CustomersInPeriod",
+            "expression": [
+              "CALCULATETABLE ( VALUES ( FactSales[CustomerKey] ), DimCustomer[IsGuest] = \"N\" )",
+              "RETURN",
+              "    COUNTROWS (",
+              "        FILTER (",
+              "            CustomersInPeriod,",
+              "            CALCULATE ( MIN ( FactSales[DateKey] ), ALL ( DimDate ) ) >= MIN ( DimDate[DateKey] )",
+              "        )",
+              "    )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Customers"
+          },
+          {
+            "name": "Returning Customers",
+            "expression": [
+              "[Customers] - [New Customers]"
+            ],
+            "formatString": "#,0",
+            "displayFolder": "Returns"
+          },
+          {
+            "name": "Repeat Customer %",
+            "expression": [
+              ""
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "VAR Repeaters",
+            "expression": [
+              "FILTER (",
+              "        CALCULATETABLE ( VALUES ( FactSales[CustomerKey] ), DimCustomer[IsGuest] = \"N\" ),",
+              "        CALCULATE ( DISTINCTCOUNT ( FactSales[OrderID] ) ) > 1",
+              "    )",
+              "RETURN",
+              "    DIVIDE ( COUNTROWS ( Repeaters ), [Customers] )"
+            ],
+            "formatString": "£#,0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Guest Share of In-Store Revenue %",
+            "expression": [
+              "DIVIDE (",
+              "    CALCULATE ( [Revenue], DimCustomer[IsGuest] = \"Y\" ),",
+              "    CALCULATE ( [Revenue], DimChannel[ChannelName] = \"In-Store\" )",
+              ")"
+            ],
+            "formatString": "0.0%",
+            "displayFolder": "Ratios"
+          },
+          {
+            "name": "Product Revenue Rank",
+            "expression": [
+              "RANKX ( ALL ( DimProduct[ProductName] ), [Revenue], , DESC, DENSE )"
+            ],
+            "formatString": "0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Store Margin Rank",
+            "expression": [
+              "RANKX ( ALL ( DimStore[StoreName] ), [Gross Margin %], , DESC, DENSE )"
+            ],
+            "formatString": "0",
+            "displayFolder": "Core"
+          },
+          {
+            "name": "Margin Colour",
+            "expression": [
+              "// Use in conditional formatting (Format > Field value) - status colours, always with a label too",
+              "SWITCH (",
+              "    TRUE (),",
+              "    [Gross Margin %] < 0.30, \"#e34948\",     // red: below 30%",
+              "    [Gross Margin %] < 0.40, \"#eda100\",     // amber",
+              "    \"#1baf7a\"                               // green",
+              ")"
+            ],
+            "displayFolder": "Core"
+          },
+          {
+            "name": "YoY Arrow",
+            "expression": [
+              "VAR g = [Revenue YoY %]",
+              "RETURN",
+              "    IF ( ISBLANK ( g ), BLANK (), IF ( g >= 0, \"▲ \", \"▼ \" ) & FORMAT ( g, \"0.0%\" ) )"
+            ],
+            "displayFolder": "Time intelligence"
+          },
+          {
+            "name": "Selected Period Label",
+            "expression": [
+              "\"FY \" & SELECTEDVALUE ( DimDate[Year], \"2024–2025\" )"
+            ],
+            "displayFolder": "Core"
+          }
+        ]
+      },
+      {
+        "name": "FactReturns",
+        "columns": [
+          {
+            "name": "ReturnKey",
+            "dataType": "int64",
+            "sourceColumn": "ReturnKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ReturnID",
+            "dataType": "string",
+            "sourceColumn": "ReturnID"
+          },
+          {
+            "name": "SalesLineKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesLineKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "OrderID",
+            "dataType": "string",
+            "sourceColumn": "OrderID"
+          },
+          {
+            "name": "OrderLineNumber",
+            "dataType": "int64",
+            "sourceColumn": "OrderLineNumber",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "sourceColumn": "DateKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "OrderDateKey",
+            "dataType": "int64",
+            "sourceColumn": "OrderDateKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "sourceColumn": "CustomerKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "StoreKey",
+            "dataType": "int64",
+            "sourceColumn": "StoreKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ChannelKey",
+            "dataType": "int64",
+            "sourceColumn": "ChannelKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "RegionKey",
+            "dataType": "int64",
+            "sourceColumn": "RegionKey",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "ReturnQty",
+            "dataType": "int64",
+            "sourceColumn": "ReturnQty",
+            "formatString": "0",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "RefundAmount",
+            "dataType": "decimal",
+            "sourceColumn": "RefundAmount",
+            "formatString": "£#,0.00",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "ReturnReason",
+            "dataType": "string",
+            "sourceColumn": "ReturnReason"
+          },
+          {
+            "name": "ReturnMethod",
+            "dataType": "string",
+            "sourceColumn": "ReturnMethod"
+          },
+          {
+            "name": "DaysToReturn",
+            "dataType": "int64",
+            "sourceColumn": "DaysToReturn",
+            "formatString": "0",
+            "summarizeBy": "sum"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactReturns",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_returns.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"ReturnKey\", Int64.Type}, {\"ReturnID\", type text}, {\"SalesLineKey\", Int64.Type}, {\"OrderID\", type text}, {\"OrderLineNumber\", Int64.Type}, {\"DateKey\", Int64.Type}, {\"OrderDateKey\", Int64.Type}, {\"CustomerKey\", Int64.Type}, {\"ProductKey\", Int64.Type}, {\"StoreKey\", Int64.Type}, {\"ChannelKey\", Int64.Type}, {\"RegionKey\", Int64.Type}, {\"ReturnQty\", Int64.Type}, {\"RefundAmount\", Currency.Type}, {\"ReturnReason\", type text}, {\"ReturnMethod\", type text}, {\"DaysToReturn\", Int64.Type}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimDate",
+        "columns": [
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "sourceColumn": "DateKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "formatString": "dd/mm/yyyy",
+            "isKey": true
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Quarter",
+            "dataType": "string",
+            "sourceColumn": "Quarter"
+          },
+          {
+            "name": "QuarterNumber",
+            "dataType": "int64",
+            "sourceColumn": "QuarterNumber",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "YearQuarter",
+            "dataType": "string",
+            "sourceColumn": "YearQuarter"
+          },
+          {
+            "name": "MonthNumber",
+            "dataType": "int64",
+            "sourceColumn": "MonthNumber",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MonthName",
+            "dataType": "string",
+            "sourceColumn": "MonthName",
+            "sortByColumn": "MonthNumber"
+          },
+          {
+            "name": "MonthShort",
+            "dataType": "string",
+            "sourceColumn": "MonthShort",
+            "sortByColumn": "MonthNumber"
+          },
+          {
+            "name": "YearMonth",
+            "dataType": "string",
+            "sourceColumn": "YearMonth",
+            "sortByColumn": "YearMonthKey"
+          },
+          {
+            "name": "YearMonthKey",
+            "dataType": "int64",
+            "sourceColumn": "YearMonthKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ISOWeek",
+            "dataType": "int64",
+            "sourceColumn": "ISOWeek",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DayOfMonth",
+            "dataType": "int64",
+            "sourceColumn": "DayOfMonth",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DayOfWeekNumber",
+            "dataType": "int64",
+            "sourceColumn": "DayOfWeekNumber",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DayName",
+            "dataType": "string",
+            "sourceColumn": "DayName",
+            "sortByColumn": "DayOfWeekNumber"
+          },
+          {
+            "name": "IsWeekend",
+            "dataType": "string",
+            "sourceColumn": "IsWeekend"
+          },
+          {
+            "name": "IsUKBankHoliday",
+            "dataType": "string",
+            "sourceColumn": "IsUKBankHoliday"
+          },
+          {
+            "name": "UKFinancialYear",
+            "dataType": "string",
+            "sourceColumn": "UKFinancialYear"
+          },
+          {
+            "name": "TradingPeriod",
+            "dataType": "string",
+            "sourceColumn": "TradingPeriod"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimDate",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_date.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"DateKey\", Int64.Type}, {\"Date\", type date}, {\"Year\", Int64.Type}, {\"Quarter\", type text}, {\"QuarterNumber\", Int64.Type}, {\"YearQuarter\", type text}, {\"MonthNumber\", Int64.Type}, {\"MonthName\", type text}, {\"MonthShort\", type text}, {\"YearMonth\", type text}, {\"YearMonthKey\", Int64.Type}, {\"ISOWeek\", Int64.Type}, {\"DayOfMonth\", Int64.Type}, {\"DayOfWeekNumber\", Int64.Type}, {\"DayName\", type text}, {\"IsWeekend\", type text}, {\"IsUKBankHoliday\", type text}, {\"UKFinancialYear\", type text}, {\"TradingPeriod\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "dataCategory": "Time",
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "Year"
+              },
+              {
+                "name": "Quarter",
+                "ordinal": 1,
+                "column": "Quarter"
+              },
+              {
+                "name": "Month",
+                "ordinal": 2,
+                "column": "MonthShort"
+              },
+              {
+                "name": "Date",
+                "ordinal": 3,
+                "column": "Date"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "DimCustomer",
+        "columns": [
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "sourceColumn": "CustomerKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "CustomerID",
+            "dataType": "string",
+            "sourceColumn": "CustomerID"
+          },
+          {
+            "name": "Gender",
+            "dataType": "string",
+            "sourceColumn": "Gender"
+          },
+          {
+            "name": "AgeBand",
+            "dataType": "string",
+            "sourceColumn": "AgeBand"
+          },
+          {
+            "name": "City",
+            "dataType": "string",
+            "sourceColumn": "City"
+          },
+          {
+            "name": "PostcodeDistrict",
+            "dataType": "string",
+            "sourceColumn": "PostcodeDistrict"
+          },
+          {
+            "name": "PostcodeValid",
+            "dataType": "string",
+            "sourceColumn": "PostcodeValid"
+          },
+          {
+            "name": "CustomerRegion",
+            "dataType": "string",
+            "sourceColumn": "CustomerRegion"
+          },
+          {
+            "name": "Segment",
+            "dataType": "string",
+            "sourceColumn": "Segment"
+          },
+          {
+            "name": "LoyaltyMember",
+            "dataType": "string",
+            "sourceColumn": "LoyaltyMember"
+          },
+          {
+            "name": "SignupDate",
+            "dataType": "dateTime",
+            "sourceColumn": "SignupDate",
+            "formatString": "dd/mm/yyyy"
+          },
+          {
+            "name": "FirstPurchaseDate",
+            "dataType": "dateTime",
+            "sourceColumn": "FirstPurchaseDate",
+            "formatString": "dd/mm/yyyy"
+          },
+          {
+            "name": "IsGuest",
+            "dataType": "string",
+            "sourceColumn": "IsGuest"
+          },
+          {
+            "name": "MergedRecords",
+            "dataType": "int64",
+            "sourceColumn": "MergedRecords",
+            "formatString": "0",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimCustomer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_customer.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"CustomerKey\", Int64.Type}, {\"CustomerID\", type text}, {\"Gender\", type text}, {\"AgeBand\", type text}, {\"City\", type text}, {\"PostcodeDistrict\", type text}, {\"PostcodeValid\", type text}, {\"CustomerRegion\", type text}, {\"Segment\", type text}, {\"LoyaltyMember\", type text}, {\"SignupDate\", type date}, {\"FirstPurchaseDate\", type date}, {\"IsGuest\", type text}, {\"MergedRecords\", Int64.Type}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimProduct",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "SKU",
+            "dataType": "string",
+            "sourceColumn": "SKU"
+          },
+          {
+            "name": "ProductName",
+            "dataType": "string",
+            "sourceColumn": "ProductName"
+          },
+          {
+            "name": "Category",
+            "dataType": "string",
+            "sourceColumn": "Category"
+          },
+          {
+            "name": "SubCategory",
+            "dataType": "string",
+            "sourceColumn": "SubCategory"
+          },
+          {
+            "name": "Brand",
+            "dataType": "string",
+            "sourceColumn": "Brand"
+          },
+          {
+            "name": "UnitCost",
+            "dataType": "decimal",
+            "sourceColumn": "UnitCost",
+            "formatString": "£#,0.00",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ListPrice",
+            "dataType": "decimal",
+            "sourceColumn": "ListPrice",
+            "formatString": "£#,0.00",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "LaunchDate",
+            "dataType": "dateTime",
+            "sourceColumn": "LaunchDate",
+            "formatString": "dd/mm/yyyy"
+          },
+          {
+            "name": "IsOwnLabel",
+            "dataType": "string",
+            "sourceColumn": "IsOwnLabel"
+          },
+          {
+            "name": "StandardMarginPct",
+            "dataType": "double",
+            "sourceColumn": "StandardMarginPct",
+            "formatString": "0.0%",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "PriceBand",
+            "dataType": "string",
+            "sourceColumn": "PriceBand"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimProduct",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_product.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"ProductKey\", Int64.Type}, {\"SKU\", type text}, {\"ProductName\", type text}, {\"Category\", type text}, {\"SubCategory\", type text}, {\"Brand\", type text}, {\"UnitCost\", Currency.Type}, {\"ListPrice\", Currency.Type}, {\"LaunchDate\", type date}, {\"IsOwnLabel\", type text}, {\"StandardMarginPct\", type number}, {\"PriceBand\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Product Hierarchy",
+            "levels": [
+              {
+                "name": "Category",
+                "ordinal": 0,
+                "column": "Category"
+              },
+              {
+                "name": "SubCategory",
+                "ordinal": 1,
+                "column": "SubCategory"
+              },
+              {
+                "name": "Product",
+                "ordinal": 2,
+                "column": "ProductName"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "DimStore",
+        "columns": [
+          {
+            "name": "StoreKey",
+            "dataType": "int64",
+            "sourceColumn": "StoreKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "StoreCode",
+            "dataType": "string",
+            "sourceColumn": "StoreCode"
+          },
+          {
+            "name": "StoreName",
+            "dataType": "string",
+            "sourceColumn": "StoreName"
+          },
+          {
+            "name": "StoreType",
+            "dataType": "string",
+            "sourceColumn": "StoreType"
+          },
+          {
+            "name": "City",
+            "dataType": "string",
+            "sourceColumn": "City"
+          },
+          {
+            "name": "Postcode",
+            "dataType": "string",
+            "sourceColumn": "Postcode"
+          },
+          {
+            "name": "StoreRegion",
+            "dataType": "string",
+            "sourceColumn": "StoreRegion"
+          },
+          {
+            "name": "SizeSqFt",
+            "dataType": "int64",
+            "sourceColumn": "SizeSqFt",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "OpenDate",
+            "dataType": "dateTime",
+            "sourceColumn": "OpenDate",
+            "formatString": "dd/mm/yyyy"
+          },
+          {
+            "name": "IsOnline",
+            "dataType": "string",
+            "sourceColumn": "IsOnline"
+          },
+          {
+            "name": "IsLikeForLike",
+            "dataType": "string",
+            "sourceColumn": "IsLikeForLike"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimStore",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_store.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"StoreKey\", Int64.Type}, {\"StoreCode\", type text}, {\"StoreName\", type text}, {\"StoreType\", type text}, {\"City\", type text}, {\"Postcode\", type text}, {\"StoreRegion\", type text}, {\"SizeSqFt\", Int64.Type}, {\"OpenDate\", type date}, {\"IsOnline\", type text}, {\"IsLikeForLike\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimRegion",
+        "columns": [
+          {
+            "name": "RegionKey",
+            "dataType": "int64",
+            "sourceColumn": "RegionKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "RegionCode",
+            "dataType": "string",
+            "sourceColumn": "RegionCode"
+          },
+          {
+            "name": "RegionName",
+            "dataType": "string",
+            "sourceColumn": "RegionName",
+            "dataCategory": "StateOrProvince"
+          },
+          {
+            "name": "Nation",
+            "dataType": "string",
+            "sourceColumn": "Nation"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimRegion",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_region.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"RegionKey\", Int64.Type}, {\"RegionCode\", type text}, {\"RegionName\", type text}, {\"Nation\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimChannel",
+        "columns": [
+          {
+            "name": "ChannelKey",
+            "dataType": "int64",
+            "sourceColumn": "ChannelKey",
+            "formatString": "0",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ChannelName",
+            "dataType": "string",
+            "sourceColumn": "ChannelName"
+          },
+          {
+            "name": "ChannelType",
+            "dataType": "string",
+            "sourceColumn": "ChannelType"
+          },
+          {
+            "name": "Description",
+            "dataType": "string",
+            "sourceColumn": "Description"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimChannel",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_channel.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),",
+                "    // empty text -> null, so blank dates/numbers don't become errors when typed",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"ChannelKey\", Int64.Type}, {\"ChannelName\", type text}, {\"ChannelType\", type text}, {\"Description\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "FactSales_DateKey",
+        "fromTable": "FactSales",
+        "fromColumn": "DateKey",
+        "toTable": "DimDate",
+        "toColumn": "DateKey"
+      },
+      {
+        "name": "FactReturns_DateKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "DateKey",
+        "toTable": "DimDate",
+        "toColumn": "DateKey"
+      },
+      {
+        "name": "FactSales_CustomerKey",
+        "fromTable": "FactSales",
+        "fromColumn": "CustomerKey",
+        "toTable": "DimCustomer",
+        "toColumn": "CustomerKey"
+      },
+      {
+        "name": "FactReturns_CustomerKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "CustomerKey",
+        "toTable": "DimCustomer",
+        "toColumn": "CustomerKey"
+      },
+      {
+        "name": "FactSales_ProductKey",
+        "fromTable": "FactSales",
+        "fromColumn": "ProductKey",
+        "toTable": "DimProduct",
+        "toColumn": "ProductKey"
+      },
+      {
+        "name": "FactReturns_ProductKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "ProductKey",
+        "toTable": "DimProduct",
+        "toColumn": "ProductKey"
+      },
+      {
+        "name": "FactSales_StoreKey",
+        "fromTable": "FactSales",
+        "fromColumn": "StoreKey",
+        "toTable": "DimStore",
+        "toColumn": "StoreKey"
+      },
+      {
+        "name": "FactReturns_StoreKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "StoreKey",
+        "toTable": "DimStore",
+        "toColumn": "StoreKey"
+      },
+      {
+        "name": "FactSales_ChannelKey",
+        "fromTable": "FactSales",
+        "fromColumn": "ChannelKey",
+        "toTable": "DimChannel",
+        "toColumn": "ChannelKey"
+      },
+      {
+        "name": "FactReturns_ChannelKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "ChannelKey",
+        "toTable": "DimChannel",
+        "toColumn": "ChannelKey"
+      },
+      {
+        "name": "FactSales_RegionKey",
+        "fromTable": "FactSales",
+        "fromColumn": "RegionKey",
+        "toTable": "DimRegion",
+        "toColumn": "RegionKey"
+      },
+      {
+        "name": "FactReturns_RegionKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "RegionKey",
+        "toTable": "DimRegion",
+        "toColumn": "RegionKey"
+      },
+      {
+        "name": "FactReturns_OrderDateKey",
+        "fromTable": "FactReturns",
+        "fromColumn": "OrderDateKey",
+        "toTable": "DimDate",
+        "toColumn": "DateKey",
+        "isActive": false
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"DataFolder\", \"FactSales\", \"FactReturns\", \"DimDate\", \"DimCustomer\", \"DimProduct\", \"DimStore\", \"DimRegion\", \"DimChannel\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      }
+    ]
+  }
+}

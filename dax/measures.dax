@@ -145,6 +145,13 @@ CALCULATE ( [Gross Margin %], ALL ( DimStore ) )
 Margin vs Company (pts) =
 ( [Gross Margin %] - [Company Margin %] ) * 100
 
+Revenue (Physical Stores) =
+// Excludes the E-commerce Hub so store league tables compare like with like
+CALCULATE ( [Revenue], DimStore[IsOnline] = "N" )
+
+Gross Margin % (Physical Stores) =
+CALCULATE ( [Gross Margin %], DimStore[IsOnline] = "N" )
+
 // ---------------------------------------------------------------- 7. ROW-BY-ROW (ITERATOR) MEASURES
 Revenue (SUMX check) =
 // Same result as [Revenue], but recalculated row by row from price, quantity and discount.

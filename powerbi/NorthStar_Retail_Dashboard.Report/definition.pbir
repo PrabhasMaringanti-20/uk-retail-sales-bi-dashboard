@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../NorthStar_Retail_Dashboard.SemanticModel"
+    },
+    "byConnection": null
+  }
+}

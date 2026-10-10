@@ -8,7 +8,7 @@
 **Stack:** PostgreSQL · SQL · Python (pandas) · Excel · Power Query (M) · Power BI · DAX · Git
 
 ![Executive overview (design mockup)](screenshots/mockup_page1_executive_overview.png)
-*Layout mockup rendered from the data in Python. See `powerbi/01_build_guide.md` to build the Power BI report.*
+*Layout mockup rendered from the data in Python. Open the real report: `powerbi/NorthStar_Retail_Dashboard.pbip` (see [`powerbi/00_SIMPLE_STEPS.md`](powerbi/00_SIMPLE_STEPS.md)).*
 
 ## Key findings
 
@@ -54,13 +54,13 @@ Date, Customer, Product, Store, Region, Channel. → [`documentation/data_model.
 | Folder | Contents |
 | --- | --- |
 | [`business-analysis/`](business-analysis/01_business_case.md) | Problem statement, objectives, scope, stakeholder map, KPI definitions |
-| [`scripts/`](scripts) | `01` generate data → `02` inject quality issues → `03` clean & model → `04` charts → `05` Excel → `06` deck · `run_pipeline.sh` |
+| [`scripts/`](scripts) | `01` generate data → `02` inject quality issues → `03` clean & model → `04` charts → `05` Excel → `06` deck → `07` Power BI Project · `run_pipeline.sh` |
 | `data/` | `raw_data.zip`, `clean_data.zip` (or rebuild with the pipeline), injected-issue answer key, cleaning log |
 | [`documentation/`](documentation) | Data dictionary, data model, validation rules, data-quality report (before/after), quality scorecard |
 | [`sql/`](sql/README.md) | Schema with constraints, load, 13 data checks, **40 business questions with results and interpretation** |
 | [`excel/`](excel/README.md) | Workbook: XLOOKUP, INDEX/MATCH, SUMIFS, COUNTIFS, conditional formatting, raw-data checks, reconciliation |
 | [`power-query/`](power-query/README.md) | M scripts applying the same cleaning rules in Power BI / Excel |
-| [`powerbi/`](powerbi/01_build_guide.md) | Click-by-click build guide for the 5 pages, theme file |
+| [`powerbi/`](powerbi/00_SIMPLE_STEPS.md) | **Ready-made Power BI Project** (`NorthStar_Retail_Dashboard.pbip`: 8 tables, 13 relationships, 52 measures, 5 pages), simple steps, detailed build guide, theme |
 | [`dax/`](dax/README.md) | 50 measures + explanations (CALCULATE, FILTER, SUMX, ALL, USERELATIONSHIP, time intelligence) |
 | [`insights/`](insights) | 10 insights (Finding → Evidence → Cause → Impact → Recommendation → Outcome), prioritised recommendations |
 | [`presentation/`](presentation) | 10-slide executive deck |
@@ -76,6 +76,7 @@ createdb northstar                     # PostgreSQL 14+
 bash scripts/run_pipeline.sh           # generate → break → clean → load → checks → zip
 psql -d northstar -f sql/04_business_questions.sql
 python scripts/04_build_charts.py && python scripts/05_build_excel.py && python scripts/06_build_presentation.py
+python scripts/07_build_powerbi_project.py   # regenerates the Power BI Project from the data + dax/measures.dax
 ```
 The generator is seeded, so every run produces identical data. **Reconciliation totals:** revenue £8,545,887.73 ·
 gross profit £3,595,003.75 · orders 89,528.
@@ -95,5 +96,6 @@ gross profit £3,595,003.75 · orders 89,528.
 - Gross profit only (no overheads, staff, rent, marketing or delivery costs).
 - Refunded goods are assumed not to be resold (conservative).
 - No inventory data, so the optional inventory page is not built.
-- Power BI must be built on Windows following the guide; the images here are Python mockups until replaced with real screenshots.
+- The Power BI Project was generated and validated by script (every field and measure checked) but has not yet been
+  opened in Power BI Desktop. The images here are Python mockups until replaced with real screenshots.
 - Benefit figures are illustrative estimates with stated assumptions.
