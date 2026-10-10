@@ -123,7 +123,7 @@ cols = [BLUE, BLUE, BLUE, ORANGE, ORANGE]
 bars = ax.bar(b.index.astype(str), b["margin"], color=cols, width=0.6)
 for bar, v, r in zip(bars, b["margin"], b["rev"]):
     ax.text(bar.get_x() + bar.get_width() / 2, v + 0.01, f"{v:.0%}", ha="center", color=INK, fontsize=10)
-    ax.text(bar.get_x() + bar.get_width() / 2, 0.012, f"£{r / 1e3:.0f}K rev", ha="center", color="white", fontsize=8)
+    ax.text(bar.get_x() + bar.get_width() / 2, 0.012, (f"£{r / 1e6:.1f}M" if r >= 1e6 else f"£{r / 1e3:.0f}K"), ha="center", color="white", fontsize=8)
 ax.yaxis.set_major_formatter(PercentFormatter(1, decimals=0))
 ax.set_title("Gross margin by discount level: deep discounts leave almost no profit")
 ax.set_xlabel("Discount on the order line")

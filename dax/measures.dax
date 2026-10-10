@@ -1,0 +1,224 @@
+// =====================================================================
+// NorthStar Retail UK (simulated) - DAX measures
+// Create a blank table called "_Measures" (Enter data -> OK) and add these
+// measures to it, so they appear in one folder at the top of the field list.
+// Table names follow the Power BI model: FactSales, FactReturns, DimDate, ...
+// Expected values (FY2025, no filters) are in comments; check them against
+// sql/README.md to prove the model reconciles.
+// =====================================================================
+
+// ---------------------------------------------------------------- 1. BASE MEASURES
+Revenue =
+SUM ( FactSales[NetSales] )                                    // FY2025: £4,584,138
+
+Gross Sales =
+SUM ( FactSales[GrossSales] )
+
+Discount Amount =
+SUM ( FactSales[DiscountAmount] )
+
+Cost =
+SUM ( FactSales[CostAmount] )
+
+Gross Profit =
+[Revenue] - [Cost]                                              // FY2025: £1,878,065
+
+Units Sold =
+SUM ( FactSales[Quantity] )
+
+// ---------------------------------------------------------------- 2. RATIOS (always DIVIDE, never "/")
+Gross Margin % =
+DIVIDE ( [Gross Profit], [Revenue] )                            // FY2025: 41.0%
+
+Discount Rate % =
+DIVIDE ( [Discount Amount], [Gross Sales] )                     // FY2025: 7.1%
+
+// ---------------------------------------------------------------- 3. COUNTS
+Orders =
+DISTINCTCOUNT ( FactSales[OrderID] )                            // FY2025: 46,889
+
+Customers =
+// Known customers only: the Guest member (-1) is one "customer" for thousands of people
+CALCULATE (
+    DISTINCTCOUNT ( FactSales[CustomerKey] ),
+    DimCustomer[IsGuest] = "N"
+)                                                               // FY2025: 8,101
+
+Average Order Value =
+DIVIDE ( [Revenue], [Orders] )                                  // FY2025: £97.77
+
+Units per Order =
+DIVIDE ( [Units Sold], [Orders] )
+
+Revenue per Customer =
+CALCULATE ( DIVIDE ( [Revenue], [Customers] ), DimCustomer[IsGuest] = "N" )
+
+// ---------------------------------------------------------------- 4. RETURNS
+Refund Amount =
+SUM ( FactReturns[RefundAmount] )                               // by RETURN date (active relationship)
+
+Returned Units =
+SUM ( FactReturns[ReturnQty] )
+
+Return Rate % =
+// Refunds in the period / revenue in the period (both on their own active date)
+DIVIDE ( [Refund Amount], [Revenue] )
+
+Refunds by Order Date =
+// Switch FactReturns to its INACTIVE relationship (OrderDateKey) for this calculation only
+CALCULATE (
+    [Refund Amount],
+    USERELATIONSHIP ( FactReturns[OrderDateKey], DimDate[DateKey] )
+)
+
+Return Rate % (Order Cohort) =
+// "Of what we SOLD in this month, how much came back?" - matches SQL Q16/Q39
+DIVIDE ( [Refunds by Order Date], [Revenue] )                   // FY2025: 8.3%
+
+Gross Profit after Returns =
+// Assumes refunded goods are not resold (conservative, stated in the report)
+[Gross Profit] - [Refunds by Order Date]
+
+Margin after Returns % =
+DIVIDE ( [Gross Profit after Returns], [Revenue] )
+
+// ---------------------------------------------------------------- 5. TIME INTELLIGENCE
+// Requires: DimDate marked as date table (Table tools > Mark as date table > Date)
+Revenue YTD =
+TOTALYTD ( [Revenue], DimDate[Date] )
+
+Revenue PY =
+CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) )   // FY2025 context -> £3,961,750
+
+Revenue YoY % =
+VAR Curr = [Revenue]
+VAR Prev = [Revenue PY]
+RETURN
+    IF ( NOT ISBLANK ( Prev ), DIVIDE ( Curr - Prev, Prev ) )   // FY2025: +15.7%
+
+Gross Profit PY =
+CALCULATE ( [Gross Profit], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+Gross Profit YoY % =
+DIVIDE ( [Gross Profit] - [Gross Profit PY], [Gross Profit PY] )   // FY2025: +9.4%
+
+Gross Margin % PY =
+CALCULATE ( [Gross Margin %], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+Gross Margin Change (pts) =
+// Margin is a percentage, so the change is in POINTS (41.0% - 43.3% = -2.4 pts), not a %
+( [Gross Margin %] - [Gross Margin % PY] ) * 100
+
+Revenue PM =
+CALCULATE ( [Revenue], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Revenue MoM % =
+DIVIDE ( [Revenue] - [Revenue PM], [Revenue PM] )
+
+Revenue Running Total =
+// Running total across ALL dates up to the last visible date (does not reset each year)
+VAR LastDate = MAX ( DimDate[Date] )
+RETURN
+    CALCULATE (
+        [Revenue],
+        FILTER ( ALL ( DimDate[Date] ), DimDate[Date] <= LastDate )
+    )
+
+Revenue 3M Moving Avg =
+CALCULATE (
+    [Revenue] / 3,
+    DATESINPERIOD ( DimDate[Date], MAX ( DimDate[Date] ), -3, MONTH )
+)
+
+// ---------------------------------------------------------------- 6. SHARE / CONTEXT MEASURES
+Revenue % of Total =
+// ALL removes the filter from the product table, so the denominator is the grand total
+DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( DimProduct ) ) )
+
+Revenue % of Channel Total =
+DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( DimChannel ) ) )
+
+Company Margin % =
+// Benchmark line for "store vs company" visuals
+CALCULATE ( [Gross Margin %], ALL ( DimStore ) )
+
+Margin vs Company (pts) =
+( [Gross Margin %] - [Company Margin %] ) * 100
+
+// ---------------------------------------------------------------- 7. ROW-BY-ROW (ITERATOR) MEASURES
+Revenue (SUMX check) =
+// Same result as [Revenue], but recalculated row by row from price, quantity and discount.
+// Used to prove the stored NetSales column is right.
+SUMX (
+    FactSales,
+    FactSales[Quantity] * FactSales[UnitPrice] * ( 1 - FactSales[DiscountPct] )
+)
+
+Profit Lost Below Cost =
+// Only order lines sold for less than they cost
+-SUMX (
+    FILTER ( FactSales, FactSales[GrossProfit] < 0 ),
+    FactSales[GrossProfit]
+)                                                               // FY2025: ~£26K
+
+Deep Discount Revenue =
+CALCULATE ( [Revenue], FactSales[DiscountPct] >= 0.30 )
+
+Deep Discount Margin % =
+CALCULATE ( [Gross Margin %], FactSales[DiscountPct] >= 0.30 )
+
+// ---------------------------------------------------------------- 8. CUSTOMER MEASURES
+New Customers =
+// Customers whose first-ever purchase falls inside the selected period
+VAR CustomersInPeriod =
+    CALCULATETABLE ( VALUES ( FactSales[CustomerKey] ), DimCustomer[IsGuest] = "N" )
+RETURN
+    COUNTROWS (
+        FILTER (
+            CustomersInPeriod,
+            CALCULATE ( MIN ( FactSales[DateKey] ), ALL ( DimDate ) ) >= MIN ( DimDate[DateKey] )
+        )
+    )
+
+Returning Customers =
+[Customers] - [New Customers]
+
+Repeat Customer % =
+// Customers with more than one order in the selected period
+VAR Repeaters =
+    FILTER (
+        CALCULATETABLE ( VALUES ( FactSales[CustomerKey] ), DimCustomer[IsGuest] = "N" ),
+        CALCULATE ( DISTINCTCOUNT ( FactSales[OrderID] ) ) > 1
+    )
+RETURN
+    DIVIDE ( COUNTROWS ( Repeaters ), [Customers] )
+
+Guest Share of In-Store Revenue % =
+DIVIDE (
+    CALCULATE ( [Revenue], DimCustomer[IsGuest] = "Y" ),
+    CALCULATE ( [Revenue], DimChannel[ChannelName] = "In-Store" )
+)
+
+// ---------------------------------------------------------------- 9. RANKING & DISPLAY
+Product Revenue Rank =
+RANKX ( ALL ( DimProduct[ProductName] ), [Revenue], , DESC, DENSE )
+
+Store Margin Rank =
+RANKX ( ALL ( DimStore[StoreName] ), [Gross Margin %], , DESC, DENSE )
+
+Margin Colour =
+// Use in conditional formatting (Format > Field value) - status colours, always with a label too
+SWITCH (
+    TRUE (),
+    [Gross Margin %] < 0.30, "#e34948",     // red: below 30%
+    [Gross Margin %] < 0.40, "#eda100",     // amber
+    "#1baf7a"                               // green
+)
+
+YoY Arrow =
+VAR g = [Revenue YoY %]
+RETURN
+    IF ( ISBLANK ( g ), BLANK (), IF ( g >= 0, "▲ ", "▼ " ) & FORMAT ( g, "0.0%" ) )
+
+Selected Period Label =
+"FY " & SELECTEDVALUE ( DimDate[Year], "2024–2025" )

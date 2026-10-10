@@ -1,0 +1,31 @@
+{
+  "name": "NorthStar Retail (colour-blind safe)",
+  "dataColors": ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"],
+  "background": "#fcfcfb",
+  "foreground": "#0b0b0b",
+  "tableAccent": "#2a78d6",
+  "good": "#1baf7a",
+  "neutral": "#eda100",
+  "bad": "#e34948",
+  "maximum": "#2a78d6",
+  "center": "#d9d8d2",
+  "minimum": "#eb6834",
+  "textClasses": {
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#0b0b0b" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 11, "color": "#0b0b0b" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#52514e" },
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 24, "color": "#0b0b0b" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#ffffff" } }, "transparency": 0 }],
+        "border": [{ "show": false }],
+        "visualHeader": [{ "show": true }]
+      }
+    },
+    "page": {
+      "*": { "background": [{ "color": { "solid": { "color": "#f1f0ec" } }, "transparency": 0 }] }
+    }
+  }
+}
