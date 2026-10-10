@@ -1,0 +1,41 @@
+RuleID,Table,Action,RowsAffected
+ST-01,stores,Region names mapped to the region reference table,2
+ST-02,stores,Postcode upper-cased and spaced,1
+PR-01,products,Exact duplicate rows removed,8
+PR-02,products,Category standardised via mapping table,137
+PR-03,products,Missing SubCategory set to 'Unclassified' (not guessed; flagged for merchandising),14
+PR-04,products,ListPrice '£' symbol removed and converted to number,30
+PR-05,products,Missing UnitCost filled from median 2024 transaction cost for the SKU,11
+PR-06,products,Missing UnitCost (2025-only SKU) = 2025 cost / measured uplift 1.060,1
+PR-07,products,Missing UnitCost (never sold) estimated from category median cost ratio,0
+CU-01,customers,Segment standardised to Title Case,214
+CU-02,customers,LoyaltyMember Yes/No recoded to Y/N,200
+CU-03,customers,Gender F/M recoded to Female/Male,141
+CU-04,customers,Missing Gender set to 'Unknown',600
+CU-05,customers,Postcode upper-cased and spaced,114
+CU-06,customers,Invalid postcode set to blank and flagged (PostcodeValid = N),52
+CU-07,customers,City casing/whitespace standardised,207
+CU-08,customers,Missing City inferred from postcode district,116
+CU-09,customers,Missing City (no valid postcode) set to 'Unknown',4
+CU-10,customers,DateOfBirth DD/MM/YYYY parsed to a date,500
+CU-11,customers,"Impossible DateOfBirth (unparseable, age <16 or >100) set to blank",25
+CU-12,customers,Duplicate customers merged into earliest record (matched on normalised email),180
+SA-01,sales_transactions,Exact duplicate rows removed (double-loaded batch),900
+SA-02,sales_transactions,Channel labels mapped to 4 standard channels,9000
+SA-03,sales_transactions,UK-format OrderDateTime parsed,5999
+SA-04,sales_transactions,Quarantined: Impossible/unparseable order date,22
+SA-05,sales_transactions,Quarantined: Order date outside reporting window,15
+SA-06,sales_transactions,Quarantined: Negative/zero quantity (refund keyed as sale; returns live in returns table),35
+SA-07,sales_transactions,Quarantined: Quantity outlier > 20 units,6
+SA-08,sales_transactions,Quarantined: SKU not in product master,12
+SA-09,sales_transactions,DiscountPct entered as whole number divided by 100,518
+SA-10,sales_transactions,Missing UnitPrice imputed from same SKU's price in the same year (list price fallback) and flagged IsPriceImputed = Y,340
+SA-11,sales_transactions,CustomerID re-pointed from duplicate to master customer,1264
+SA-12,sales_transactions,Blank CustomerID kept as Guest (-1): legitimate in-store anonymous sale,29222
+RE-01,returns,Exact duplicate rows removed,53
+RE-02,returns,Quarantined: No matching (valid) sales line - orphan return,26
+RE-03,returns,Quarantined: Return date before order date,20
+RE-04,returns,ReturnQty capped at quantity sold,10
+RE-05,returns,ReturnReason casing/format standardised,591
+RE-06,returns,Missing ReturnReason set to 'Not stated',399
+RE-07,returns,Duplicate ReturnID removed after standardisation (kept first),7

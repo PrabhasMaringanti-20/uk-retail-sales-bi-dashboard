@@ -1,0 +1,9 @@
+# Large CSVs are rebuilt by scripts/run_pipeline.sh and shipped zipped (data/*.zip)
+data/_truth/
+data/raw/*.csv
+!data/raw/_injected_issues.csv
+data/clean/*.csv
+!data/clean/_cleaning_log.csv
+data/quarantine/*.csv
+__pycache__/
+~$*
