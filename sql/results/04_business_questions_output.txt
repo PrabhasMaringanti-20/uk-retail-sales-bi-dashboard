@@ -1,0 +1,603 @@
+SET
+=== Q01. What are the headline KPIs for the whole period? ===
+ revenue |  cost   | gross_profit | margin_pct | orders | known_customers |  aov  | units  
+---------+---------+--------------+------------+--------+-----------------+-------+--------
+ 8545888 | 4950884 |      3595004 |      42.07 |  89528 |            9530 | 95.45 | 221599
+
+=== Q02. How did revenue, profit and margin change between 2024 and 2025? ===
+ year | revenue | gross_profit | margin_pct | orders |  aov  
+------+---------+--------------+------------+--------+-------
+ 2024 | 3961750 |      1716939 |      43.34 |  42639 | 92.91
+ 2025 | 4584138 |      1878065 |      40.97 |  46889 | 97.77
+
+=== Q03. Which categories drive revenue, and how profitable are they? ===
+     category      | revenue | revenue_share_pct | gross_profit | profit_share_pct | margin_pct 
+-------------------+---------+-------------------+--------------+------------------+------------
+ Electronics       | 1646832 |              19.3 |       213776 |              5.9 |       13.0
+ Clothing          | 1433399 |              16.8 |       735016 |             20.4 |       51.3
+ Footwear          | 1199414 |              14.0 |       568068 |             15.8 |       47.4
+ Home & Kitchen    | 1171083 |              13.7 |       475591 |             13.2 |       40.6
+ Beauty            | 1051132 |              12.3 |       640425 |             17.8 |       60.9
+ Accessories       |  869579 |              10.2 |       483663 |             13.5 |       55.6
+ Sports & Outdoors |  679858 |               8.0 |       274141 |              7.6 |       40.3
+ Toys & Games      |  494591 |               5.8 |       204324 |              5.7 |       41.3
+
+=== Q04. How is revenue split by channel, and which channels are growing? ===
+  channel_name   | revenue_2024 | revenue_2025 | growth_pct | margin_pct 
+-----------------+--------------+--------------+------------+------------
+ In-Store        |      2081164 |      2171716 |        4.4 |       43.6
+ Website         |      1219418 |      1492825 |       22.4 |       40.1
+ Mobile App      |       400894 |       597251 |       49.0 |       41.5
+ Click & Collect |       260274 |       322346 |       23.8 |       41.1
+
+=== Q05. What are the top 10 products by revenue? ===
+     sku      |                  product_name                  |    category    | units | revenue | margin_pct 
+--------------+------------------------------------------------+----------------+-------+---------+------------
+ NS-ELE-00681 | Pixelpoint Nordic Over-Ear Headphones          | Electronics    |  1103 |  296547 |       15.0
+ NS-HOM-00398 | Linen Lane Studio Coffee Machine               | Home & Kitchen |   864 |  117660 |       36.7
+ NS-CLO-00140 | Urban Thread Premium Wool Coat - Black         | Clothing       |   645 |   91783 |       46.2
+ NS-FTW-00270 | Ashford & Co Active Chelsea Boot - Black       | Footwear       |  1433 |   89947 |       46.0
+ NS-HOM-00429 | Hearth & Home Original Mirror                  | Home & Kitchen |  1317 |   74816 |       38.6
+ NS-CLO-00032 | Northline Coastal Wool Coat - Teal             | Clothing       |   814 |   64466 |       50.0
+ NS-ELE-00680 | Pixelpoint Studio Kids Tablet                  | Electronics    |   872 |   62751 |        3.6
+ NS-CLO-00216 | Urban Thread Eco Parka - Stone                 | Clothing       |   632 |   59974 |       46.3
+ NS-BEA-00830 | Glow Theory Original Gift Set                  | Beauty         |  1082 |   59956 |       55.9
+ NS-ACC-01209 | Silverleaf Studio Chronograph Watch - Charcoal | Accessories    |   296 |   59591 |       52.5
+
+=== Q06. Which products have the weakest margins, and how often are they sold below cost? ===
+     sku      |                   product_name                   |  category   | list_margin_pct | revenue | actual_margin_pct | pct_lines_below_cost | loss_on_those_lines 
+--------------+--------------------------------------------------+-------------+-----------------+---------+-------------------+----------------------+---------------------
+ NS-ELE-00601 | Voltix Coastal Over-Ear Headphones               | Electronics |             9.9 |   21904 |               1.5 |                 25.3 |                1158
+ NS-ELE-00658 | NorthStar Essentials Lite Smart Speaker          | Electronics |            10.9 |   40234 |               1.9 |                 25.9 |                2215
+ NS-ELE-00701 | Sonara Original Over-Ear Headphones              | Electronics |            10.9 |   27849 |               2.9 |                 21.9 |                1243
+ NS-ELE-00680 | Pixelpoint Studio Kids Tablet                    | Electronics |            11.5 |   62751 |               3.6 |                 24.2 |                2685
+ NS-ELE-00598 | Pixelpoint Heritage Video Doorbell               | Electronics |            11.9 |   14356 |               4.0 |                 24.0 |                 615
+ NS-ELE-00700 | NorthStar Essentials Lite Smartwatch             | Electronics |            11.3 |   53345 |               5.1 |                 18.8 |                1690
+ NS-ELE-00676 | Sonara Heritage E-Reader                         | Electronics |            11.7 |   12235 |               5.6 |                 15.7 |                 432
+ NS-ELE-00661 | NorthStar Essentials Coastal Over-Ear Headphones | Electronics |            13.9 |   35825 |               6.4 |                 20.9 |                1278
+ NS-ELE-00613 | Voltix Everyday Over-Ear Headphones              | Electronics |            16.1 |   26876 |               8.2 |                 20.6 |                1038
+ NS-ELE-00618 | Sonara Urban Indoor Camera                       | Electronics |            16.5 |   14432 |               9.5 |                 19.5 |                 421
+ NS-ELE-00654 | Voltix Studio Smart Speaker                      | Electronics |            17.0 |   45435 |               9.8 |                 19.9 |                1382
+ NS-ELE-00648 | Sonara Deluxe Smartwatch                         | Electronics |            17.7 |   33130 |              10.3 |                 18.4 |                1115
+
+=== Q06b. How much gross profit is lost on order lines sold BELOW cost? ===
+     category      | lines_below_cost | profit_lost | pct_revenue_below_cost 
+-------------------+------------------+-------------+------------------------
+ Electronics       |             4301 |       41848 |                   13.0
+ Home & Kitchen    |              241 |         451 |                    0.6
+ Toys & Games      |              219 |         198 |                    0.6
+ Sports & Outdoors |              157 |         165 |                    0.5
+ Footwear          |               33 |          39 |                    0.1
+ Clothing          |                6 |           2 |                    0.0
+ Accessories       |                0 |             |                       
+ Beauty            |                0 |             |                       
+
+=== Q07. Which sub-categories have a margin below 30% (HAVING)? ===
+  category   |   sub_category    | revenue | margin_pct 
+-------------+-------------------+---------+------------
+ Electronics | Tablets & Gadgets |  481969 |       11.9
+ Electronics | Smart Home        |  345385 |       12.6
+ Electronics | Unclassified      |   11226 |       13.2
+ Electronics | Headphones        |  684304 |       13.5
+ Electronics | Phone Accessories |  123946 |       15.3
+
+=== Q08. How does each UK region perform? ===
+       region_name        |      nation      | revenue | revenue_share_pct | margin_pct |  aov   
+--------------------------+------------------+---------+-------------------+------------+--------
+ London                   | England          | 1670910 |              19.6 |       42.6 |  94.00
+ North West               | England          | 1092290 |              12.8 |       42.6 |  96.05
+ South East               | England          | 1042637 |              12.2 |       39.8 |  93.18
+ West Midlands            | England          |  756574 |               8.9 |       42.6 |  97.22
+ Scotland                 | Scotland         |  752912 |               8.8 |       43.1 |  93.59
+ South West               | England          |  652744 |               7.6 |       42.4 |  97.19
+ East of England          | England          |  648018 |               7.6 |       41.9 | 101.06
+ Yorkshire and the Humber | England          |  640450 |               7.5 |       42.5 |  95.75
+ East Midlands            | England          |  401489 |               4.7 |       41.8 |  99.65
+ Wales                    | Wales            |  334966 |               3.9 |       42.7 |  93.99
+ North East               | England          |  296121 |               3.5 |       38.6 |  90.06
+ Northern Ireland         | Northern Ireland |  256778 |               3.0 |       42.8 |  96.32
+
+=== Q09. How do discounts affect margin? (CASE to build discount bands) ===
+ discount_band  | lines  | revenue | discount_given | margin_pct 
+----------------+--------+---------+----------------+------------
+ 1. No discount | 136504 | 6688831 |              0 |       46.2
+ 2. 5-15%       |  16854 |  742107 |          85802 |       38.4
+ 3. 20-25%      |  11140 |  415923 |         124976 |       28.9
+ 4. 30-35%      |  14339 |  489214 |         234185 |       18.4
+ 5. 40%+        |   7021 |  209812 |         152744 |        5.6
+
+=== Q10. Weekend vs weekday: how does shopping differ by channel? ===
+  channel_name   | day_type | orders | orders_per_day 
+-----------------+----------+--------+----------------
+ Click & Collect | Weekday  |   4125 |            7.9
+ Click & Collect | Weekend  |   2180 |           10.5
+ In-Store        | Weekday  |  31934 |           61.3
+ In-Store        | Weekend  |  16901 |           81.3
+ Mobile App      | Weekday  |   7061 |           13.5
+ Mobile App      | Weekend  |   2846 |           13.7
+ Website         | Weekday  |  17307 |           33.1
+ Website         | Weekend  |   7174 |           34.5
+
+=== Q11. Which payment methods do customers use in each channel? ===
+  channel_name   | payment_method | orders | share_pct 
+-----------------+----------------+--------+-----------
+ Click & Collect | Debit Card     |   2627 |      41.7
+ Click & Collect | Credit Card    |   1401 |      22.2
+ Click & Collect | PayPal         |   1372 |      21.8
+ Click & Collect | Klarna         |    905 |      14.4
+ In-Store        | Contactless    |  25538 |      52.3
+ In-Store        | Mobile Wallet  |   8796 |      18.0
+ In-Store        | Chip & PIN     |   8694 |      17.8
+ In-Store        | Cash           |   5807 |      11.9
+ Mobile App      | Debit Card     |   4080 |      41.2
+ Mobile App      | Credit Card    |   2255 |      22.8
+ Mobile App      | PayPal         |   2215 |      22.4
+ Mobile App      | Klarna         |   1357 |      13.7
+ Website         | Debit Card     |  10237 |      41.8
+ Website         | PayPal         |   5449 |      22.3
+ Website         | Credit Card    |   5359 |      21.9
+ Website         | Klarna         |   3436 |      14.0
+
+=== Q12. What is the return rate by category? ===
+     category      | revenue | refunds | return_rate_pct 
+-------------------+---------+---------+-----------------
+ Footwear          | 1199414 |  177740 |            14.8
+ Clothing          | 1433399 |  181261 |            12.6
+ Electronics       | 1646832 |  125932 |             7.6
+ Sports & Outdoors |  679858 |   41881 |             6.2
+ Home & Kitchen    | 1171083 |   58643 |             5.0
+ Accessories       |  869579 |   36388 |             4.2
+ Toys & Games      |  494591 |   18390 |             3.7
+ Beauty            | 1051132 |   16213 |             1.5
+
+=== Q13. Monthly KPI trend (CTE) ===
+ year_month | revenue | gross_profit | margin_pct | orders |  aov   
+------------+---------+--------------+------------+--------+--------
+ 2024-01    |  281703 |        97318 |       34.5 |   3276 |  85.99
+ 2024-02    |  220386 |       105557 |       47.9 |   2355 |  93.58
+ 2024-03    |  278422 |       126715 |       45.5 |   2861 |  97.32
+ 2024-04    |  288446 |       129811 |       45.0 |   2987 |  96.57
+ 2024-05    |  298641 |       135310 |       45.3 |   3191 |  93.59
+ 2024-06    |  283232 |       123512 |       43.6 |   3250 |  87.15
+ 2024-07    |  293905 |       119722 |       40.7 |   3469 |  84.72
+ 2024-08    |  307845 |       140005 |       45.5 |   3431 |  89.72
+ 2024-09    |  290157 |       131799 |       45.4 |   3067 |  94.61
+ 2024-10    |  350548 |       161961 |       46.2 |   3404 | 102.98
+ 2024-11    |  512777 |       205962 |       40.2 |   5200 |  98.61
+ 2024-12    |  555687 |       239265 |       43.1 |   6148 |  90.39
+ 2025-01    |  305779 |        86286 |       28.2 |   3620 |  84.47
+ 2025-02    |  250449 |       115237 |       46.0 |   2412 | 103.83
+ 2025-03    |  321582 |       142472 |       44.3 |   3143 | 102.32
+ 2025-04    |  332447 |       146114 |       44.0 |   3285 | 101.20
+ 2025-05    |  358057 |       157286 |       43.9 |   3616 |  99.02
+ 2025-06    |  327169 |       135503 |       41.4 |   3556 |  92.00
+ 2025-07    |  317437 |       115009 |       36.2 |   3788 |  83.80
+ 2025-08    |  357183 |       158369 |       44.3 |   3795 |  94.12
+ 2025-09    |  359826 |       159653 |       44.4 |   3443 | 104.51
+ 2025-10    |  416673 |       184329 |       44.2 |   3794 | 109.82
+ 2025-11    |  603487 |       220969 |       36.6 |   5898 | 102.32
+ 2025-12    |  634049 |       256837 |       40.5 |   6539 |  96.96
+
+=== Q14. Store league table (physical stores): revenue, margin, sales density ===
+         store_name         |   store_type    |       store_region       | revenue | margin_pct | avg_discount_pct | revenue_per_sq_ft | open_date  
+----------------------------+-----------------+--------------------------+---------+------------+------------------+-------------------+------------
+ Bluewater Outlet           | Outlet          | South East               |  128418 |       24.7 |             29.0 |              8.03 | 2018-10-01
+ Newcastle Eldon Square     | Shopping Centre | North East               |  164794 |       37.0 |             15.3 |              7.85 | 2012-09-01
+ Reading Oracle             | Shopping Centre | South East               |  198583 |       43.2 |              5.4 |              9.46 | 2015-02-11
+ London Oxford Street       | Flagship        | London                   |  387746 |       43.4 |              5.8 |              9.23 | 2012-03-01
+ Coventry West Orchards     | High Street     | West Midlands            |  112303 |       43.5 |              5.3 |              8.64 | 2016-07-01
+ Brighton Churchill Square  | Shopping Centre | South East               |  189065 |       43.9 |              5.5 |              9.45 | 2013-06-01
+ Cambridge Grand Arcade     | High Street     | East of England          |  146568 |       43.9 |              5.4 |              9.77 | 2014-11-01
+ Birmingham Bullring        | Flagship        | West Midlands            |  324761 |       44.0 |              5.4 |              9.55 | 2010-10-01
+ Cardiff St David's         | Shopping Centre | Wales                    |  170391 |       44.0 |              5.2 |              8.52 | 2014-03-01
+ Bristol Cabot Circus       | Shopping Centre | South West               |  222446 |       44.0 |              4.9 |              9.27 | 2011-09-01
+ Glasgow Buchanan Galleries | Flagship        | Scotland                 |  265678 |       44.1 |              5.1 |              8.86 | 2011-11-11
+ Norwich Chapelfield        | Shopping Centre | East of England          |  144126 |       44.1 |              5.0 |              9.01 | 2012-08-20
+ Belfast Victoria Square    | Shopping Centre | Northern Ireland         |  156035 |       44.1 |              5.2 |              8.67 | 2015-03-01
+ Manchester Arndale         | Flagship        | North West               |  334006 |       44.1 |              5.6 |              9.28 | 2011-05-01
+ Liverpool ONE              | Shopping Centre | North West               |  243427 |       44.2 |              5.4 |              9.36 | 2012-05-30
+ Exeter Princesshay         | High Street     | South West               |  126551 |       44.2 |              5.0 |              9.04 | 2017-03-15
+ London Brent Cross         | Shopping Centre | London                   |  235582 |       44.2 |              5.4 |              9.06 | 2016-04-20
+ London Stratford           | Shopping Centre | London                   |  296509 |       44.2 |              5.2 |              9.88 | 2014-09-15
+ Leeds Trinity              | Shopping Centre | Yorkshire and the Humber |  201912 |       44.3 |              5.3 |              9.18 | 2013-03-21
+ Nottingham Victoria        | Shopping Centre | East Midlands            |  162657 |       44.3 |              5.2 |              8.56 | 2013-04-01
+ Sheffield Meadowhall       | Retail Park     | Yorkshire and the Humber |  143097 |       44.3 |              5.5 |              5.72 | 2024-07-04
+ London Croydon             | High Street     | London                   |  174423 |       44.4 |              5.4 |              9.69 | 2010-05-01
+ Preston Fishergate         | High Street     | North West               |  102554 |       44.7 |              4.9 |              8.55 | 2015-08-01
+ Edinburgh St James Quarter | Shopping Centre | Scotland                 |  203868 |       44.7 |              5.2 |              8.86 | 2021-06-24
+
+=== Q15. Which physical stores have a margin below the physical-store average? (subquery) ===
+       store_name       | store_margin_pct | avg_store_margin_pct 
+------------------------+------------------+----------------------
+ Bluewater Outlet       |             24.7 |                 43.3
+ Newcastle Eldon Square |             37.0 |                 43.3
+ Reading Oracle         |             43.2 |                 43.3
+
+=== Q16. Return rate by channel and year (is it rising?) ===
+  channel_name   | year | return_rate_pct | lines_returned_pct 
+-----------------+------+-----------------+--------------------
+ Click & Collect | 2024 |            6.11 |               6.35
+ Click & Collect | 2025 |            6.69 |               6.36
+ In-Store        | 2024 |            4.19 |               4.21
+ In-Store        | 2025 |            4.51 |               4.42
+ Mobile App      | 2024 |           10.09 |               9.83
+ Mobile App      | 2025 |           12.23 |              12.02
+ Website         | 2024 |           11.03 |              11.18
+ Website         | 2025 |           12.46 |              12.83
+
+=== Q17. Why are customers returning items? Top reasons per category ===
+     category      |      return_reason       | returns | share_of_category_returns_pct 
+-------------------+--------------------------+---------+-------------------------------
+ Accessories       | Changed mind             |     278 |                          39.0
+ Accessories       | Damaged / defective item |     185 |                          25.9
+ Accessories       | Not as described         |     136 |                          19.1
+ Accessories       | Faulty / defective       |      52 |                           7.3
+ Accessories       | Arrived late             |      38 |                           5.3
+ Accessories       | Not stated               |      24 |                           3.4
+ Beauty            | Changed mind             |     233 |                          41.6
+ Beauty            | Damaged / defective item |     156 |                          27.9
+ Beauty            | Not as described         |     117 |                          20.9
+ Beauty            | Faulty / defective       |      33 |                           5.9
+ Beauty            | Not stated               |      21 |                           3.8
+ Clothing          | Wrong size / fit         |    2285 |                          50.9
+ Clothing          | Changed mind             |     900 |                          20.0
+ Clothing          | Not as described         |     711 |                          15.8
+ Clothing          | Damaged / defective item |     259 |                           5.8
+ Clothing          | Arrived late             |     192 |                           4.3
+ Clothing          | Not stated               |     146 |                           3.2
+ Electronics       | Faulty / defective       |    1136 |                          53.1
+ Electronics       | Changed mind             |     408 |                          19.1
+ Electronics       | Not as described         |     262 |                          12.2
+ Electronics       | Damaged / defective item |     207 |                           9.7
+ Electronics       | Arrived late             |      73 |                           3.4
+ Electronics       | Not stated               |      55 |                           2.6
+ Footwear          | Wrong size / fit         |    1962 |                          62.7
+ Footwear          | Changed mind             |     492 |                          15.7
+ Footwear          | Not as described         |     364 |                          11.6
+ Footwear          | Damaged / defective item |     147 |                           4.7
+ Footwear          | Arrived late             |     100 |                           3.2
+ Footwear          | Not stated               |      63 |                           2.0
+ Home & Kitchen    | Changed mind             |     425 |                          35.2
+ Home & Kitchen    | Damaged / defective item |     281 |                          23.3
+ Home & Kitchen    | Not as described         |     239 |                          19.8
+ Home & Kitchen    | Faulty / defective       |     187 |                          15.5
+ Home & Kitchen    | Arrived late             |      40 |                           3.3
+ Home & Kitchen    | Not stated               |      34 |                           2.8
+ Sports & Outdoors | Changed mind             |     497 |                          41.4
+ Sports & Outdoors | Damaged / defective item |     303 |                          25.3
+ Sports & Outdoors | Not as described         |     211 |                          17.6
+ Sports & Outdoors | Faulty / defective       |      81 |                           6.8
+ Sports & Outdoors | Arrived late             |      68 |                           5.7
+ Sports & Outdoors | Not stated               |      40 |                           3.3
+ Toys & Games      | Changed mind             |     270 |                          41.9
+ Toys & Games      | Damaged / defective item |     174 |                          27.0
+ Toys & Games      | Not as described         |     125 |                          19.4
+ Toys & Games      | Faulty / defective       |      46 |                           7.1
+ Toys & Games      | Arrived late             |      30 |                           4.7
+
+=== Q18. Which products have a return rate above 25% (min 40 units sold)? ===
+     sku      |              product_name               |   brand    | sub_category | units_sold | units_returned | unit_return_rate_pct 
+--------------+-----------------------------------------+------------+--------------+------------+----------------+----------------------
+ NS-ELE-00694 | Voltix Signature Video Doorbell         | Voltix     | Smart Home   |         66 |             20 |                 30.3
+ NS-ELE-00610 | Voltix Heritage Indoor Camera           | Voltix     | Smart Home   |         41 |             12 |                 29.3
+ NS-FTW-00286 | Stride Lab Heritage Chelsea Boot - Sand | Stride Lab | Boots        |         57 |             15 |                 26.3
+ NS-FTW-00262 | Stride Lab Heritage Chelsea Boot - Grey | Stride Lab | Boots        |         42 |             11 |                 26.2
+ NS-ELE-00666 | Voltix Original Smart Bulb              | Voltix     | Smart Home   |       1096 |            279 |                 25.5
+
+=== Q19. Brand return rates 2024 vs 2025 (conditional aggregation with FILTER) ===
+        brand         | return_rate_2024 | return_rate_2025 | change_pts | revenue 
+----------------------+------------------+------------------+------------+---------
+ Stride Lab           |             10.2 |             28.2 |       18.0 |  409751
+ Peak Step            |             10.9 |             14.7 |        3.8 |  105324
+ Ashford & Co         |             10.7 |             13.1 |        2.4 |  681320
+ Northline            |             11.9 |             13.8 |        1.9 |  348330
+ Sonara               |              5.6 |              7.4 |        1.8 |  287423
+ NorthStar Essentials |              9.6 |             11.3 |        1.7 |  965647
+ Urban Thread         |             12.0 |             13.0 |        1.0 |  467997
+ Voltix               |             12.5 |             11.2 |       -1.3 |  365187
+ Pixelpoint           |              7.1 |              5.7 |       -1.4 |  648667
+
+=== Q20. How do promotional trading periods perform? ===
+  trading_period   | days | revenue_per_day | discount_rate_pct | margin_pct 
+-------------------+------+-----------------+-------------------+------------
+ Black Friday Week |   20 |           23201 |              20.4 |       30.1
+ Christmas Trading |   47 |           19350 |               2.1 |       45.4
+ Boxing Day Sale   |   12 |           15264 |              27.3 |       26.9
+ Regular Trading   |  506 |           11027 |               2.1 |       44.7
+ Summer Sale       |   84 |            9785 |              12.0 |       38.4
+ January Sale      |   62 |            9476 |              21.5 |       31.3
+
+=== Q21. New vs returning customers by quarter ===
+ year_quarter | new_customers | returning_customers | returning_order_share_pct 
+--------------+---------------+---------------------+---------------------------
+ 2024-Q1      |          3377 |                1688 |                      50.7
+ 2024-Q2      |          1537 |                2752 |                      79.9
+ 2024-Q3      |          1014 |                3263 |                      87.5
+ 2024-Q4      |          1086 |                4235 |                      91.1
+ 2025-Q1      |           553 |                3627 |                      92.7
+ 2025-Q2      |           630 |                3931 |                      92.8
+ 2025-Q3      |           602 |                4193 |                      93.5
+ 2025-Q4      |           731 |                5079 |                      94.6
+
+=== Q22. What is each customer segment worth? ===
+  segment   | customers | revenue | revenue_per_customer | orders_per_customer |  aov   | margin_pct 
+------------+-----------+---------+----------------------+---------------------+--------+------------
+ Mainstream |      3922 | 3047805 |                  777 |                7.82 |  99.32 |       42.0
+ Value      |      4128 | 2098282 |                  508 |                6.74 |  75.45 |       42.4
+ Premium    |      1480 | 2043087 |                 1380 |               10.73 | 128.70 |       40.8
+
+=== Q23. How much in-store revenue comes from unidentified (guest) shoppers? ===
+        store_name         | in_store_revenue | guest_share_pct 
+---------------------------+------------------+-----------------
+ Cardiff St David's        |           151719 |            34.1
+ London Brent Cross        |           208720 |            33.7
+ Birmingham Bullring       |           285806 |            33.5
+ Nottingham Victoria       |           143974 |            33.1
+ Manchester Arndale        |           294813 |            32.9
+ London Stratford          |           255121 |            32.7
+ Brighton Churchill Square |           168300 |            32.5
+ Bluewater Outlet          |           114875 |            32.4
+ London Oxford Street      |           343336 |            32.4
+ Exeter Princesshay        |           112584 |            32.1
+
+=== Q24. Month-over-month revenue growth (LAG) ===
+ year_month | revenue | prev_month | mom_growth_pct 
+------------+---------+------------+----------------
+ 2024-01    |  281703 |            |               
+ 2024-02    |  220386 |     281703 |          -21.8
+ 2024-03    |  278422 |     220386 |           26.3
+ 2024-04    |  288446 |     278422 |            3.6
+ 2024-05    |  298641 |     288446 |            3.5
+ 2024-06    |  283232 |     298641 |           -5.2
+ 2024-07    |  293905 |     283232 |            3.8
+ 2024-08    |  307845 |     293905 |            4.7
+ 2024-09    |  290157 |     307845 |           -5.7
+ 2024-10    |  350548 |     290157 |           20.8
+ 2024-11    |  512777 |     350548 |           46.3
+ 2024-12    |  555687 |     512777 |            8.4
+ 2025-01    |  305779 |     555687 |          -45.0
+ 2025-02    |  250449 |     305779 |          -18.1
+ 2025-03    |  321582 |     250449 |           28.4
+ 2025-04    |  332447 |     321582 |            3.4
+ 2025-05    |  358057 |     332447 |            7.7
+ 2025-06    |  327169 |     358057 |           -8.6
+ 2025-07    |  317437 |     327169 |           -3.0
+ 2025-08    |  357183 |     317437 |           12.5
+ 2025-09    |  359826 |     357183 |            0.7
+ 2025-10    |  416673 |     359826 |           15.8
+ 2025-11    |  603487 |     416673 |           44.8
+ 2025-12    |  634049 |     603487 |            5.1
+
+=== Q25. Year-over-year growth for each month (LAG over 12 rows) ===
+ month_short | revenue_2024 | revenue_2025 | revenue_yoy_pct | profit_yoy_pct 
+-------------+--------------+--------------+-----------------+----------------
+ Jan         |       281703 |       305779 |             8.5 |          -11.3
+ Feb         |       220386 |       250449 |            13.6 |            9.2
+ Mar         |       278422 |       321582 |            15.5 |           12.4
+ Apr         |       288446 |       332447 |            15.3 |           12.6
+ May         |       298641 |       358057 |            19.9 |           16.2
+ Jun         |       283232 |       327169 |            15.5 |            9.7
+ Jul         |       293905 |       317437 |             8.0 |           -3.9
+ Aug         |       307845 |       357183 |            16.0 |           13.1
+ Sep         |       290157 |       359826 |            24.0 |           21.1
+ Oct         |       350548 |       416673 |            18.9 |           13.8
+ Nov         |       512777 |       603487 |            17.7 |            7.3
+ Dec         |       555687 |       634049 |            14.1 |            7.3
+
+=== Q26. Year-to-date running total revenue (SUM OVER with PARTITION) ===
+ year | month_number | revenue | ytd_revenue 
+------+--------------+---------+-------------
+ 2024 |            1 |  281703 |      281703
+ 2024 |            2 |  220386 |      502089
+ 2024 |            3 |  278422 |      780511
+ 2024 |            4 |  288446 |     1068957
+ 2024 |            5 |  298641 |     1367598
+ 2024 |            6 |  283232 |     1650830
+ 2024 |            7 |  293905 |     1944736
+ 2024 |            8 |  307845 |     2252581
+ 2024 |            9 |  290157 |     2542738
+ 2024 |           10 |  350548 |     2893286
+ 2024 |           11 |  512777 |     3406062
+ 2024 |           12 |  555687 |     3961750
+ 2025 |            1 |  305779 |      305779
+ 2025 |            2 |  250449 |      556227
+ 2025 |            3 |  321582 |      877809
+ 2025 |            4 |  332447 |     1210256
+ 2025 |            5 |  358057 |     1568313
+ 2025 |            6 |  327169 |     1895482
+ 2025 |            7 |  317437 |     2212919
+ 2025 |            8 |  357183 |     2570102
+ 2025 |            9 |  359826 |     2929928
+ 2025 |           10 |  416673 |     3346602
+ 2025 |           11 |  603487 |     3950089
+ 2025 |           12 |  634049 |     4584138
+
+=== Q27. Top 3 products in each category (RANK inside a partition) ===
+     category      | rnk |                     product_name                     | revenue 
+-------------------+-----+------------------------------------------------------+---------
+ Accessories       |   1 | Silverleaf Studio Chronograph Watch - Charcoal       |   59591
+ Accessories       |   2 | Silverleaf Heritage Chronograph Watch - Stone        |   44915
+ Accessories       |   3 | NorthStar Essentials Classic Minimalist Watch - Sand |   39973
+ Beauty            |   1 | Glow Theory Original Gift Set                        |   59956
+ Beauty            |   2 | Pure Botanic Essential Eau de Parfum                 |   58244
+ Beauty            |   3 | NorthStar Essentials Premium Hair Dryer              |   45700
+ Clothing          |   1 | Urban Thread Premium Wool Coat - Black               |   91783
+ Clothing          |   2 | Northline Coastal Wool Coat - Teal                   |   64466
+ Clothing          |   3 | Urban Thread Eco Parka - Stone                       |   59974
+ Electronics       |   1 | Pixelpoint Nordic Over-Ear Headphones                |  300402
+ Electronics       |   2 | Pixelpoint Studio Kids Tablet                        |   62751
+ Electronics       |   3 | Voltix Heritage Wireless Earbuds                     |   56356
+ Footwear          |   1 | Ashford & Co Active Chelsea Boot - Black             |   89947
+ Footwear          |   2 | Stride Lab Pro Chelsea Boot - Olive                  |   59467
+ Footwear          |   3 | Stride Lab Urban Derby Shoe - Charcoal               |   46740
+ Home & Kitchen    |   1 | Linen Lane Studio Coffee Machine                     |  117660
+ Home & Kitchen    |   2 | Hearth & Home Original Mirror                        |   74816
+ Home & Kitchen    |   3 | NorthStar Essentials Heritage Blender                |   44358
+ Sports & Outdoors |   1 | Peak Step Signature 2-Person Tent                    |   43926
+ Sports & Outdoors |   2 | Trailforge Urban Sleeping Bag                        |   35034
+ Sports & Outdoors |   3 | Peak Step Coastal Sleeping Bag                       |   31650
+ Toys & Games      |   1 | PlayCraft Urban Remote Control Car                   |   52733
+ Toys & Games      |   2 | PlayCraft Everyday Scooter                           |   38200
+ Toys & Games      |   3 | Brainy Box Deluxe Scooter                            |   27529
+
+=== Q28. Best store in each region (ROW_NUMBER) ===
+       store_region       |    top_store_by_profit     | gross_profit | stores_in_region 
+--------------------------+----------------------------+--------------+------------------
+ London                   | London Oxford Street       |       168332 |                4
+ North West               | Manchester Arndale         |       147322 |                3
+ West Midlands            | Birmingham Bullring        |       142759 |                2
+ Scotland                 | Glasgow Buchanan Galleries |       117102 |                2
+ South West               | Bristol Cabot Circus       |        97956 |                2
+ Yorkshire and the Humber | Leeds Trinity              |        89453 |                2
+ South East               | Reading Oracle             |        85875 |                3
+ Wales                    | Cardiff St David's         |        74971 |                1
+ East Midlands            | Nottingham Victoria        |        72133 |                1
+ Northern Ireland         | Belfast Victoria Square    |        68777 |                1
+ East of England          | Cambridge Grand Arcade     |        64346 |                2
+ North East               | Newcastle Eldon Square     |        60898 |                1
+
+=== Q29. 3-month moving average of revenue (smooths seasonality) ===
+ year_month | revenue | moving_avg_3m 
+------------+---------+---------------
+ 2024-01    |  281703 |        281703
+ 2024-02    |  220386 |        251044
+ 2024-03    |  278422 |        260170
+ 2024-04    |  288446 |        262418
+ 2024-05    |  298641 |        288503
+ 2024-06    |  283232 |        290106
+ 2024-07    |  293905 |        291926
+ 2024-08    |  307845 |        294994
+ 2024-09    |  290157 |        297302
+ 2024-10    |  350548 |        316183
+ 2024-11    |  512777 |        384494
+ 2024-12    |  555687 |        473004
+ 2025-01    |  305779 |        458081
+ 2025-02    |  250449 |        370638
+ 2025-03    |  321582 |        292603
+ 2025-04    |  332447 |        301492
+ 2025-05    |  358057 |        337362
+ 2025-06    |  327169 |        339224
+ 2025-07    |  317437 |        334221
+ 2025-08    |  357183 |        333930
+ 2025-09    |  359826 |        344815
+ 2025-10    |  416673 |        377894
+ 2025-11    |  603487 |        459996
+ 2025-12    |  634049 |        551403
+
+=== Q30. How long until customers buy again? (LAG on each customer's orders) ===
+  segment   | repeat_orders | avg_days_between_orders | median_days 
+------------+---------------+-------------------------+-------------
+ Premium    |         14395 |                      38 |          20
+ Mainstream |         26764 |                      51 |          27
+ Value      |         23683 |                      58 |          31
+
+=== Q31. After a first order, how many customers come back within 90 days? (LEAD) by first channel ===
+ first_order_channel | first_time_customers | repurchase_within_90d_pct 
+---------------------+----------------------+---------------------------
+ Mobile App          |                  702 |                      52.0
+ Website             |                 1746 |                      50.9
+ Click & Collect     |                  471 |                      50.3
+ In-Store            |                 2503 |                      48.6
+
+=== Q32. Pareto: what share of customers generates 80% of known-customer revenue? ===
+ pct_customers_for_50pct_revenue | pct_customers_for_80pct_revenue | active_customers 
+---------------------------------+---------------------------------+------------------
+                            14.3 |                            38.2 |             9530
+
+=== Q33. Like-for-like (LFL) growth: stores open the whole of both years vs all stores ===
+     store_group      | revenue_2024 | revenue_2025 | growth_pct 
+----------------------+--------------+--------------+------------
+ LFL stores           |      2285475 |      2406929 |        5.3
+ New stores (non-LFL) |        55963 |        87133 |       55.7
+ Online hub           |      1620312 |      2090076 |       29.0
+                      |      3961750 |      4584138 |       15.7
+
+=== Q34. Customer cohort retention: % of each acquisition quarter still buying later ===
+ cohort  | cohort_size | next_q_pct | q_plus_2_pct | q_plus_4_pct 
+---------+-------------+------------+--------------+--------------
+ 2024-Q2 |        1537 |       50.3 |         59.9 |         45.9
+ 2024-Q3 |        1014 |       55.0 |         43.3 |         41.8
+ 2024-Q4 |        1086 |       39.7 |         43.4 |         47.6
+ 2025-Q1 |         553 |       45.0 |         43.9 |             
+ 2025-Q2 |         630 |       47.3 |         54.9 |             
+ 2025-Q3 |         602 |       56.8 |              |             
+ 2025-Q4 |         731 |            |              |             
+
+=== Q35. RFM segmentation (NTILE scores for Recency, Frequency, Monetary) ===
+       rfm_segment       | customers | avg_recency_days | avg_orders | revenue | revenue_share_pct 
+-------------------------+-----------+------------------+------------+---------+-------------------
+ 1. Champions            |      2154 |               14 |       18.3 | 3975161 |              55.3
+ 2. Loyal                |      2114 |               42 |        8.0 | 1541711 |              21.4
+ 3. New / promising      |       792 |               17 |        2.0 |  152547 |               2.1
+ 4. At risk (were loyal) |      1450 |              254 |        7.7 | 1051271 |              14.6
+ 5. Lapsed               |      2362 |              357 |        1.7 |  345636 |               4.8
+ 6. Needs attention      |       658 |               62 |        1.9 |  122848 |               1.7
+
+=== Q36. At what discount does each category stop making money? ===
+     category      | margin_no_disc | margin_5_15 | margin_20_30 | margin_35_plus | break_even_discount_pct 
+-------------------+----------------+-------------+--------------+----------------+-------------------------
+ Electronics       |           18.8 |         8.9 |        -10.1 |          -32.2 |                    18.7
+ Home & Kitchen    |           44.7 |        38.2 |         25.3 |            9.3 |                    44.7
+ Sports & Outdoors |           44.8 |        38.1 |         25.4 |           10.9 |                    44.8
+ Toys & Games      |           45.5 |        39.1 |         25.9 |           10.5 |                    45.4
+ Footwear          |           50.9 |        45.2 |         33.8 |           19.8 |                    50.9
+ Clothing          |           55.0 |        49.7 |         39.1 |           26.1 |                    54.9
+ Accessories       |           58.5 |        53.6 |         44.1 |           32.5 |                    58.5
+ Beauty            |           62.3 |        58.2 |         49.2 |           38.4 |                    62.3
+
+=== Q37. Why did margin fall? Decompose 2024 vs 2025 (discount rate vs cost ratio) ===
+ year | discount_rate_pct_of_gross | cost_pct_of_gross_sales | margin_pct 
+------+----------------------------+-------------------------+------------
+ 2024 |                       5.85 |                   53.35 |      43.34
+ 2025 |                       7.12 |                   54.83 |      40.97
+
+=== Q38. Profit after returns by channel (refunded goods assumed not resold) ===
+  channel_name   | revenue | margin_pct | refunds | profit_after_returns | margin_after_returns_pct 
+-----------------+---------+------------+---------+----------------------+--------------------------
+ Website         | 2712242 |       40.1 |  320387 |               767016 |                     28.3
+ Mobile App      |  998145 |       41.5 |  113489 |               300307 |                     30.1
+ Click & Collect |  582621 |       41.1 |   37464 |               201807 |                     34.6
+ In-Store        | 4252879 |       43.6 |  185108 |              1669425 |                     39.3
+
+=== Q39. Online clothing & footwear return rate by order month (is the trend real?) ===
+ year_month | return_rate_pct 
+------------+-----------------
+ 2024-01    |            16.6
+ 2024-02    |            17.8
+ 2024-03    |            18.4
+ 2024-04    |            14.6
+ 2024-05    |            14.5
+ 2024-06    |            17.1
+ 2024-07    |            16.5
+ 2024-08    |            15.6
+ 2024-09    |            15.6
+ 2024-10    |            17.8
+ 2024-11    |            18.9
+ 2024-12    |            15.0
+ 2025-01    |            21.5
+ 2025-02    |            21.7
+ 2025-03    |            23.4
+ 2025-04    |            21.2
+ 2025-05    |            23.9
+ 2025-06    |            23.5
+ 2025-07    |            26.7
+ 2025-08    |            27.2
+ 2025-09    |            28.5
+ 2025-10    |            27.0
+ 2025-11    |            27.6
+ 2025-12    |            14.9
+
+=== Q40. Which categories are bought together? (self-join on order) ===
+ category_a |    category_b     | orders_together | pct_of_all_orders 
+------------+-------------------+-----------------+-------------------
+ Beauty     | Clothing          |            7369 |              8.23
+ Clothing   | Electronics       |            5577 |              6.23
+ Clothing   | Home & Kitchen    |            5400 |              6.03
+ Beauty     | Electronics       |            5016 |              5.60
+ Beauty     | Home & Kitchen    |            4978 |              5.56
+ Clothing   | Footwear          |            4854 |              5.42
+ Clothing   | Sports & Outdoors |            4500 |              5.03
+ Beauty     | Footwear          |            4355 |              4.86
+ Beauty     | Toys & Games      |            4169 |              4.66
+ Beauty     | Sports & Outdoors |            4069 |              4.54
+

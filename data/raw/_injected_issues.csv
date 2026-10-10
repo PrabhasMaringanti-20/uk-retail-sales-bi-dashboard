@@ -1,6 +1,6 @@
 Table,Issue,RowsAffected,Detail
 customers,"Duplicate customer (re-registered, new ID)",180,Email differs only by case/leading spaces; first name upper-cased
-sales_transactions,Sales recorded against duplicate customer ID,1261,
+sales_transactions,Sales recorded against duplicate customer ID,1204,
 customers,Missing Postcode,260,
 customers,Missing Gender,600,
 customers,Missing DateOfBirth,950,

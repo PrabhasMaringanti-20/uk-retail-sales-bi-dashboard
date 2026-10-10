@@ -138,7 +138,8 @@ CH_RETURN_FACTOR = np.array([1.0, 2.3, 2.1, 1.4])
 # ---------------------------------------------------------------------------
 # 3. Products
 # ---------------------------------------------------------------------------
-# category: (subcategories, price range, cost ratio range, base return rate, brands)
+# category: (subcategories, overall price range (documentation only - item prices below), cost ratio range,
+#            base return rate, brands)
 CATEGORIES = {
     "Clothing": (["Womenswear", "Menswear", "Kidswear", "Outerwear"], (10, 95), (0.40, 0.50), 0.075,
                  ["Northline", "Ashford & Co", "Urban Thread", "NorthStar Essentials"]),
@@ -165,39 +166,51 @@ CAT_CODES = {"Clothing": "CLO", "Footwear": "FTW", "Home & Kitchen": "HOM", "Ele
 CAT_DEMAND = {"Clothing": 1.30, "Footwear": 0.85, "Home & Kitchen": 0.9, "Electronics": 0.95,
               "Beauty": 1.1, "Toys & Games": 0.6, "Sports & Outdoors": 0.65, "Accessories": 0.65}
 
+# Item types per sub-category with a realistic UK retail price range (min £, max £)
 ITEM_WORDS = {
-    "Womenswear": ["Wrap Dress", "Linen Shirt", "Knit Jumper", "Wide-Leg Trousers", "Midi Skirt", "Blouse"],
-    "Menswear": ["Oxford Shirt", "Chino Trousers", "Crew Jumper", "Polo Shirt", "Slim Jeans", "Overshirt"],
-    "Kidswear": ["Kids Hoodie", "School Polo", "Kids Joggers", "Pyjama Set", "Kids T-Shirt"],
-    "Outerwear": ["Puffer Jacket", "Wool Coat", "Rain Mac", "Gilet", "Parka"],
-    "Trainers": ["Running Trainer", "Court Trainer", "Canvas Trainer", "Trail Runner"],
-    "Boots": ["Chelsea Boot", "Hiking Boot", "Ankle Boot", "Wellington"],
-    "Formal Shoes": ["Derby Shoe", "Loafer", "Brogue", "Court Heel"],
-    "Sandals": ["Slider", "Strappy Sandal", "Flip Flop", "Walking Sandal"],
-    "Cookware": ["Frying Pan", "Saucepan Set", "Casserole Dish", "Knife Block"],
-    "Bedding": ["Duvet Cover Set", "Pillow Pair", "Fitted Sheet", "Throw"],
-    "Home Decor": ["Table Lamp", "Candle Set", "Photo Frame", "Cushion", "Mirror"],
-    "Small Appliances": ["Kettle", "Toaster", "Air Fryer", "Blender", "Coffee Machine"],
-    "Headphones": ["Wireless Earbuds", "Over-Ear Headphones", "Sports Earphones"],
-    "Smart Home": ["Smart Plug", "Smart Bulb", "Video Doorbell", "Smart Speaker", "Indoor Camera"],
-    "Phone Accessories": ["Phone Case", "Charging Cable", "Power Bank", "Wireless Charger"],
-    "Tablets & Gadgets": ["Kids Tablet", "E-Reader", "Fitness Tracker", "Smartwatch", "Bluetooth Speaker"],
-    "Skincare": ["Moisturiser", "Serum", "Cleanser", "SPF Cream", "Face Mask"],
-    "Fragrance": ["Eau de Parfum", "Eau de Toilette", "Body Mist", "Gift Set"],
-    "Makeup": ["Foundation", "Mascara", "Lipstick", "Eyeshadow Palette"],
-    "Haircare": ["Shampoo", "Conditioner", "Hair Oil", "Hair Dryer"],
-    "Board Games": ["Strategy Game", "Family Quiz Game", "Card Game"],
-    "Kids Toys": ["Building Set", "Plush Toy", "Remote Control Car", "Doll House"],
-    "Puzzles": ["1000-Piece Puzzle", "Kids Floor Puzzle", "3D Puzzle"],
-    "Outdoor Toys": ["Garden Swing", "Football Goal", "Water Blaster", "Scooter"],
-    "Fitness": ["Yoga Mat", "Dumbbell Set", "Resistance Bands", "Kettlebell"],
-    "Camping": ["2-Person Tent", "Sleeping Bag", "Camping Chair", "Head Torch"],
-    "Cycling": ["Bike Helmet", "Bike Lights Set", "Cycling Gloves", "Bike Lock"],
-    "Activewear": ["Gym Leggings", "Running Top", "Training Shorts", "Sports Bra"],
-    "Bags": ["Tote Bag", "Backpack", "Crossbody Bag", "Weekend Holdall"],
-    "Jewellery": ["Silver Necklace", "Hoop Earrings", "Charm Bracelet", "Ring Set"],
-    "Watches": ["Analogue Watch", "Chronograph Watch", "Minimalist Watch"],
-    "Sunglasses": ["Aviator Sunglasses", "Round Sunglasses", "Sports Sunglasses"],
+    "Womenswear": {"Wrap Dress": (25, 70), "Linen Shirt": (20, 45), "Knit Jumper": (22, 60),
+                   "Wide-Leg Trousers": (22, 55), "Midi Skirt": (18, 45), "Blouse": (16, 40)},
+    "Menswear": {"Oxford Shirt": (20, 45), "Chino Trousers": (22, 50), "Crew Jumper": (22, 60),
+                 "Polo Shirt": (14, 35), "Slim Jeans": (25, 60), "Overshirt": (28, 65)},
+    "Kidswear": {"Kids Hoodie": (10, 22), "School Polo": (5, 12), "Kids Joggers": (8, 18),
+                 "Pyjama Set": (9, 20), "Kids T-Shirt": (5, 12)},
+    "Outerwear": {"Puffer Jacket": (45, 120), "Wool Coat": (70, 160), "Rain Mac": (35, 85),
+                  "Gilet": (30, 70), "Parka": (60, 140)},
+    "Trainers": {"Running Trainer": (45, 120), "Court Trainer": (35, 90), "Canvas Trainer": (25, 55),
+                 "Trail Runner": (55, 130)},
+    "Boots": {"Chelsea Boot": (45, 110), "Hiking Boot": (60, 140), "Ankle Boot": (40, 95), "Wellington": (20, 45)},
+    "Formal Shoes": {"Derby Shoe": (45, 110), "Loafer": (40, 100), "Brogue": (50, 120), "Court Heel": (30, 75)},
+    "Sandals": {"Slider": (10, 25), "Strappy Sandal": (18, 45), "Flip Flop": (6, 18), "Walking Sandal": (25, 60)},
+    "Cookware": {"Frying Pan": (15, 45), "Saucepan Set": (40, 120), "Casserole Dish": (30, 90), "Knife Block": (30, 100)},
+    "Bedding": {"Duvet Cover Set": (20, 70), "Pillow Pair": (12, 40), "Fitted Sheet": (10, 30), "Throw": (15, 45)},
+    "Home Decor": {"Table Lamp": (20, 70), "Candle Set": (8, 25), "Photo Frame": (6, 22), "Cushion": (8, 25),
+                   "Mirror": (25, 90)},
+    "Small Appliances": {"Kettle": (20, 60), "Toaster": (20, 60), "Air Fryer": (50, 150), "Blender": (25, 90),
+                         "Coffee Machine": (60, 200)},
+    "Headphones": {"Wireless Earbuds": (25, 180), "Over-Ear Headphones": (40, 300), "Sports Earphones": (15, 70)},
+    "Smart Home": {"Smart Plug": (10, 25), "Smart Bulb": (8, 30), "Video Doorbell": (50, 180),
+                   "Smart Speaker": (30, 200), "Indoor Camera": (25, 90)},
+    "Phone Accessories": {"Phone Case": (8, 35), "Charging Cable": (6, 20), "Power Bank": (15, 50),
+                          "Wireless Charger": (15, 45)},
+    "Tablets & Gadgets": {"Kids Tablet": (60, 140), "E-Reader": (80, 180), "Fitness Tracker": (30, 130),
+                          "Smartwatch": (90, 380), "Bluetooth Speaker": (25, 150)},
+    "Skincare": {"Moisturiser": (8, 45), "Serum": (12, 60), "Cleanser": (6, 25), "SPF Cream": (8, 30),
+                 "Face Mask": (5, 20)},
+    "Fragrance": {"Eau de Parfum": (35, 110), "Eau de Toilette": (25, 80), "Body Mist": (8, 22), "Gift Set": (20, 70)},
+    "Makeup": {"Foundation": (10, 40), "Mascara": (7, 28), "Lipstick": (6, 30), "Eyeshadow Palette": (10, 45)},
+    "Haircare": {"Shampoo": (4, 18), "Conditioner": (4, 18), "Hair Oil": (8, 30), "Hair Dryer": (25, 120)},
+    "Board Games": {"Strategy Game": (20, 50), "Family Quiz Game": (15, 35), "Card Game": (8, 20)},
+    "Kids Toys": {"Building Set": (15, 80), "Plush Toy": (8, 25), "Remote Control Car": (20, 60), "Doll House": (35, 90)},
+    "Puzzles": {"1000-Piece Puzzle": (10, 22), "Kids Floor Puzzle": (8, 18), "3D Puzzle": (12, 35)},
+    "Outdoor Toys": {"Garden Swing": (40, 120), "Football Goal": (25, 70), "Water Blaster": (6, 20), "Scooter": (30, 90)},
+    "Fitness": {"Yoga Mat": (12, 40), "Dumbbell Set": (25, 90), "Resistance Bands": (8, 22), "Kettlebell": (15, 50)},
+    "Camping": {"2-Person Tent": (40, 150), "Sleeping Bag": (25, 90), "Camping Chair": (15, 45), "Head Torch": (8, 30)},
+    "Cycling": {"Bike Helmet": (25, 90), "Bike Lights Set": (12, 45), "Cycling Gloves": (10, 30), "Bike Lock": (15, 55)},
+    "Activewear": {"Gym Leggings": (18, 50), "Running Top": (15, 40), "Training Shorts": (14, 35), "Sports Bra": (15, 40)},
+    "Bags": {"Tote Bag": (15, 60), "Backpack": (25, 90), "Crossbody Bag": (25, 85), "Weekend Holdall": (40, 120)},
+    "Jewellery": {"Silver Necklace": (20, 80), "Hoop Earrings": (12, 45), "Charm Bracelet": (18, 70), "Ring Set": (12, 40)},
+    "Watches": {"Analogue Watch": (40, 150), "Chronograph Watch": (70, 220), "Minimalist Watch": (35, 120)},
+    "Sunglasses": {"Aviator Sunglasses": (18, 70), "Round Sunglasses": (15, 60), "Sports Sunglasses": (20, 80)},
 }
 ADJECTIVES = ["Classic", "Essential", "Premium", "Everyday", "Signature", "Heritage", "Active", "Lite",
               "Pro", "Eco", "Deluxe", "Urban", "Coastal", "Nordic", "Studio", "Original"]
@@ -205,13 +218,15 @@ COLOURS = ["Black", "Navy", "Grey", "White", "Olive", "Sand", "Blush", "Teal", "
 
 product_rows = []
 pid = 0
-for cat, (subcats, (pmin, pmax), (cmin, cmax), _ret, brands) in CATEGORIES.items():
+for cat, (subcats, _range, (cmin, cmax), _ret, brands) in CATEGORIES.items():
     for i in range(CAT_PRODUCT_COUNT[cat]):
         pid += 1
         sub = subcats[i % len(subcats)]
         brand = rng.choice(brands)
-        # Price: log-uniform within range, rounded to retail .99 / .49 endings
-        price = float(np.exp(rng.uniform(np.log(pmin), np.log(pmax))))
+        item = rng.choice(list(ITEM_WORDS[sub]))
+        imin, imax = ITEM_WORDS[sub][item]
+        # Price: log-uniform within the item's range, rounded to retail .99 / .49 endings
+        price = float(np.exp(rng.uniform(np.log(imin), np.log(imax))))
         price = max(round(price) - 0.01, 2.99) if price > 10 else round(price * 2) / 2 - 0.01
         own_label = brand == "NorthStar Essentials"
         cost_ratio = rng.uniform(cmin, cmax) - (0.06 if own_label else 0.0)
@@ -220,14 +235,14 @@ for cat, (subcats, (pmin, pmax), (cmin, cmax), _ret, brands) in CATEGORIES.items
         if loss_leader:
             cost_ratio = rng.uniform(0.86, 0.91)
         cost = round(price * cost_ratio, 2)
-        name = f"{brand} {rng.choice(ADJECTIVES)} {rng.choice(ITEM_WORDS[sub])}"
+        name = f"{brand} {rng.choice(ADJECTIVES)} {item}"
         if cat in ("Clothing", "Footwear", "Accessories"):
             name += f" - {rng.choice(COLOURS)}"
         # 10% of products launch during the 2-year window
         launch = pd.Timestamp("2019-01-01") + pd.Timedelta(days=int(rng.integers(0, 1800)))
         if rng.random() < 0.10:
             launch = pd.Timestamp(START) + pd.Timedelta(days=int(rng.integers(30, 640)))
-        popularity = rng.pareto(1.6) + 0.3      # long tail: few best-sellers, many slow movers
+        popularity = rng.lognormal(0, 1.0)      # long tail: few best-sellers, many slow movers
         product_rows.append(dict(SKU=f"NS-{CAT_CODES[cat]}-{pid:05d}", ProductName=name, Category=cat,
                                  SubCategory=sub, Brand=brand, UnitCost=cost, ListPrice=price,
                                  LaunchDate=launch, IsOwnLabel="Y" if own_label else "N",
