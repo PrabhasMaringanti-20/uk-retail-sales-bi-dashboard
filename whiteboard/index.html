@@ -1,0 +1,664 @@
+<title>NorthStar Project Whiteboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an infinite whiteboard — 3-column grid of numbered zones on a dotted canvas, pan by dragging, zoom with buttons, ctrl+wheel or pinch */
+:root {
+  --canvas: #eef1f4;
+  --dot: #cfd6dd;
+  --paper: #ffffff;
+  --ink: #15212e;
+  --ink-2: #4b5967;
+  --line: #d3dbe3;
+  --accent: #0f6e8c;
+  --accent-soft: #dff0f6;
+  --yellow: #fff3bf;
+  --green: #dcf3e4;
+  --pink: #fde2e4;
+  --blue: #dcebff;
+  --code-bg: #f3f6f9;
+  --bad: #b3261e;
+  --good: #1f7a45;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --canvas: #10161d; --dot: #253140; --paper: #18222d; --ink: #e5ecf2; --ink-2: #a6b3c0; --line: #2c3a48;
+  --accent: #62c6e3; --accent-soft: #16323d; --yellow: #3a3418; --green: #183326; --pink: #3a1e22; --blue: #182a40;
+  --code-bg: #1f2b37; --bad: #ff8a80; --good: #6fd39a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --canvas: #10161d; --dot: #253140; --paper: #18222d; --ink: #e5ecf2; --ink-2: #a6b3c0; --line: #2c3a48;
+  --accent: #62c6e3; --accent-soft: #16323d; --yellow: #3a3418; --green: #183326; --pink: #3a1e22; --blue: #182a40;
+  --code-bg: #1f2b37; --bad: #ff8a80; --good: #6fd39a; color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--canvas); color: var(--ink); font: 22px/1.5 var(--font-body); overflow: hidden;
+  padding-left: max(0px, env(safe-area-inset-left, 0px)); padding-right: max(0px, env(safe-area-inset-right, 0px)); }
+* { box-sizing: border-box; }
+
+/* toolbar */
+.bar { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 10px); left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--paper); border: 1px solid var(--line);
+  border-radius: 12px; padding: 8px 10px; font-size: 14px; box-shadow: 0 4px 18px rgba(0,0,0,.08); }
+.bar .name { font: 700 15px var(--font-display); margin-right: 6px; }
+.bar button, .bar select { font: 500 14px var(--font-body); color: var(--ink); background: var(--canvas); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; min-height: 34px; }
+.bar button:focus-visible, .bar select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bar .pct { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.bar .hint { color: var(--ink-2); margin-left: auto; }
+@media (max-width: 700px) { .bar .hint { display: none; } }
+
+#view { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab;
+  background-image: radial-gradient(var(--dot) 1.6px, transparent 1.6px); background-size: 28px 28px; }
+#view.dragging { cursor: grabbing; }
+#board { position: absolute; left: 0; top: 0; transform-origin: 0 0; width: 5900px; padding: 220px;
+  display: grid; grid-template-columns: repeat(3, 1700px); column-gap: 200px; row-gap: 260px; align-items: start; user-select: none; }
+
+/* zones */
+.zone { background: color-mix(in srgb, var(--paper) 55%, transparent); border: 3px dashed var(--line); border-radius: 28px; padding: 56px; min-width: 0; }
+.span2 { grid-column: span 2; }
+.span3 { grid-column: span 3; }
+.zone > header { display: flex; align-items: baseline; gap: 24px; margin-bottom: 36px; }
+.num { font: 800 84px/1 var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.zone h2 { font: 800 64px/1.05 var(--font-display); margin: 0; text-wrap: balance; }
+.zone .sub { font-size: 26px; color: var(--ink-2); margin: 8px 0 0; max-width: 60ch; }
+.row { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 30px 34px; min-width: 0; box-shadow: 0 2px 0 rgba(0,0,0,.03); }
+.card h3 { font: 600 30px/1.25 var(--font-body); margin: 0 0 12px; }
+.card p { margin: 0 0 12px; }
+.card ul, .card ol { margin: 0; padding-left: 30px; }
+.card li { margin-bottom: 8px; }
+.sticky { border: 0; transform: rotate(-0.6deg); }
+.sticky.r { transform: rotate(0.7deg); }
+.y { background: var(--yellow); } .g { background: var(--green); } .p { background: var(--pink); } .b { background: var(--blue); }
+.w1 { width: 480px; } .w2 { width: 760px; } .w3 { width: 1000px; } .w4 { width: 1588px; } .full { width: 100%; }
+.big { font: 800 56px/1.05 var(--font-display); display: block; font-variant-numeric: tabular-nums; }
+.lbl { font-size: 20px; color: var(--ink-2); }
+.tag { display: inline-block; font: 600 16px/1 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+strong { font-weight: 600; }
+code { font: 0.86em var(--font-mono); background: var(--code-bg); padding: 2px 8px; border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 21px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 16px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+tr:last-child td { border-bottom: 0; }
+
+/* images with callouts */
+.shot { display: grid; grid-template-columns: 1600px 1fr; gap: 36px; width: 100%; align-items: start; }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 50px; }
+.shots .shot { grid-template-columns: 1fr; }
+.shot img, .imgc img { width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--line); }
+.imgc { width: 790px; }
+.imgc figcaption, .slide figcaption { margin-top: 14px; font-size: 21px; }
+.callouts { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; counter-reset: c; }
+.callouts li { counter-increment: c; position: relative; padding-left: 58px; }
+.callouts li::before { content: counter(c); position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--paper); font: 600 20px/40px var(--font-body); text-align: center; }
+.slides { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.slide img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--line); }
+
+/* code */
+.codewrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 36px; width: 100%; align-items: start; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 14px; padding: 24px 28px; font: 20px/1.6 var(--font-mono); overflow: hidden; white-space: pre-wrap; word-break: break-word; }
+.file { font: 500 18px var(--font-mono); color: var(--ink-2); display: block; margin-bottom: 10px; }
+.mk { display: inline-block; min-width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--paper); font: 600 17px/34px var(--font-body); text-align: center; margin-right: 6px; }
+.cm { color: var(--ink-2); }
+
+/* diagrams */
+svg { display: block; width: 100%; height: auto; }
+svg .box { fill: var(--paper); stroke: var(--ink-2); stroke-width: 2.5; }
+svg .boxa { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 3; }
+svg .boxy { fill: var(--yellow); stroke: var(--ink-2); stroke-width: 2; }
+svg .boxg { fill: var(--green); stroke: var(--good); stroke-width: 2.5; }
+svg .boxp { fill: var(--pink); stroke: var(--bad); stroke-width: 2.5; }
+svg .head { fill: var(--accent); }
+svg text { fill: var(--ink); font-family: var(--font-body); }
+svg .t-head { fill: var(--paper); font-weight: 600; }
+svg .t-mono { font-family: var(--font-mono); }
+svg .t-dim { fill: var(--ink-2); }
+svg .ln { stroke: var(--ink-2); stroke-width: 2.5; fill: none; }
+svg .lna { stroke: var(--accent); stroke-width: 3.5; fill: none; }
+svg .dash { stroke-dasharray: 10 8; }
+svg .life { stroke: var(--line); stroke-width: 3; stroke-dasharray: 8 8; }
+svg .arrow { fill: var(--ink-2); }
+svg .arrowa { fill: var(--accent); }
+
+.qa { width: 788px; }
+.qa h3 { color: var(--accent); }
+.check li { list-style: none; position: relative; padding-left: 44px; }
+.check { padding-left: 0 !important; }
+.check li::before { content: ""; position: absolute; left: 0; top: 6px; width: 26px; height: 26px; border: 3px solid var(--accent); border-radius: 6px; }
+.say { font-size: 25px; line-height: 1.55; }
+.foot { grid-column: span 3; text-align: center; color: var(--ink-2); font-size: 24px; }
+@media (prefers-reduced-motion: no-preference) { #board.anim { transition: transform .35s ease; } }
+</style>
+
+<div class="bar" role="toolbar" aria-label="Whiteboard controls">
+  <span class="name">NorthStar Project Whiteboard</span>
+  <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+  <span class="pct" id="pct">100%</span>
+  <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+  <button id="fit" type="button">Fit all</button>
+  <label for="jump" class="hint" style="margin-left:0">Go to</label>
+  <select id="jump" aria-label="Go to section"></select>
+  <span class="hint">Drag to move · Ctrl + scroll or pinch to zoom · click a section to zoom in</span>
+</div>
+
+<div id="view">
+<div id="board">
+
+<!-- 01 WHAT -->
+<section class="zone" id="z1" data-name="01 What the project is">
+  <header><span class="num">01</span><div><h2>What the project is</h2><p class="sub">Start here. One pretend shop, one problem, one dashboard.</p></div></header>
+  <div class="row">
+    <div class="card sticky y full"><span class="tag">In one sentence</span><p style="font-size:30px;line-height:1.4;margin:0">A pretend UK shop chain sells more every year but doesn't make more profit. This project finds out <strong>why</strong>, and <strong>what the managers should do</strong>.</p></div>
+    <div class="card w2"><h3>The pretend company</h3><p><strong>NorthStar Retail UK</strong>: 24 stores + website + app, selling clothes, shoes, electronics, beauty, home, toys, sports, accessories.</p><p><strong>Not a real company.</strong> A Python program created the data so it behaves like a real shop. Always say this in interviews.</p></div>
+    <div class="card w2"><h3>The business problem</h3><p>Managers get <strong>4 reports that disagree</strong> (stores, website, finance, returns). Sales are up, but nobody knows where profit is lost.</p><p>Goal: <strong>one trusted set of numbers</strong> + a dashboard that answers what, why, where, what to do.</p></div>
+    <div class="card w1"><span class="big">+15.7%</span><span class="lbl">sales growth 2024 → 2025<br>£3.96M → £4.58M</span></div>
+    <div class="card w1"><span class="big">+9.4%</span><span class="lbl">profit growth only</span></div>
+    <div class="card w1"><span class="big">−2.4p</span><span class="lbl">profit per £1 of sales<br>43.3% → 41.0% margin</span></div>
+    <div class="card sticky g r full"><h3>The 5 findings</h3><ol><li><strong>Too many discounts</strong>: 30%+ discounts leave almost no profit.</li><li><strong>Electronics</strong>: 19% of sales, only 6% of profit; loses money above ~19% discount.</li><li><strong>Costs rose faster than prices</strong>: suppliers +6%, prices only +3%.</li><li><strong>Online returns rising</strong>: clothes &amp; shoes ~16% → ~27%, mostly one shoe brand (Stride Lab, wrong sizes).</li><li><strong>Two stores over-discount</strong>: Newcastle gives 3× the discount of other stores.</li></ol></div>
+    <div class="card w2"><h3>Why employers care</h3><p>This is exactly what Data / BI Analysts do: messy data → clean → database → dashboard → decisions. It uses the tools UK adverts ask for: <strong>SQL, Power BI, DAX, Excel</strong>.</p></div>
+    <div class="card sticky p w2"><h3>How to use this board</h3><p>Read the zones in number order: <strong>01 → 16</strong>. Use <strong>Go to</strong> in the toolbar to jump. Zoom in on any card to read it.</p></div>
+  </div>
+</section>
+
+<!-- 02 HOW IT WORKS -->
+<section class="zone span2" id="z2" data-name="02 How it works">
+  <header><span class="num">02</span><div><h2>How it works: the pipeline</h2><p class="sub">A chain. Each step takes the output of the step before it.</p></div></header>
+  <div class="card full">
+  <svg viewBox="0 0 3440 380" role="img" aria-label="Pipeline: create data, make messy, clean, database, SQL, Power BI, findings, presentation">
+    <defs><marker id="ar" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" class="arrowa"/></marker></defs>
+    <g font-size="30">
+      <rect class="boxa" x="0" y="80" width="360" height="200" rx="20"/><text x="180" y="150" text-anchor="middle" font-weight="600">1. Create data</text><text x="180" y="195" text-anchor="middle" class="t-dim" font-size="24">Python</text><text x="180" y="235" text-anchor="middle" class="t-mono" font-size="20">01_generate_data.py</text>
+      <rect class="boxp" x="440" y="80" width="360" height="200" rx="20"/><text x="620" y="150" text-anchor="middle" font-weight="600">2. Make it messy</text><text x="620" y="195" text-anchor="middle" class="t-dim" font-size="24">Python, on purpose</text><text x="620" y="235" text-anchor="middle" class="t-mono" font-size="20">02_inject_quality…py</text>
+      <rect class="boxg" x="880" y="80" width="360" height="200" rx="20"/><text x="1060" y="150" text-anchor="middle" font-weight="600">3. Clean it</text><text x="1060" y="195" text-anchor="middle" class="t-dim" font-size="24">40 logged rules</text><text x="1060" y="235" text-anchor="middle" class="t-mono" font-size="20">03_clean_data.py</text>
+      <rect class="boxa" x="1320" y="80" width="360" height="200" rx="20"/><text x="1500" y="150" text-anchor="middle" font-weight="600">4. Database</text><text x="1500" y="195" text-anchor="middle" class="t-dim" font-size="24">PostgreSQL star schema</text><text x="1500" y="235" text-anchor="middle" class="t-mono" font-size="20">sql/01 + 02 + 03</text>
+      <rect class="boxa" x="1760" y="80" width="360" height="200" rx="20"/><text x="1940" y="150" text-anchor="middle" font-weight="600">5. Ask questions</text><text x="1940" y="195" text-anchor="middle" class="t-dim" font-size="24">40 SQL queries</text><text x="1940" y="235" text-anchor="middle" class="t-mono" font-size="20">sql/04_business…sql</text>
+      <rect class="boxa" x="2200" y="80" width="360" height="200" rx="20"/><text x="2380" y="150" text-anchor="middle" font-weight="600">6. Dashboard</text><text x="2380" y="195" text-anchor="middle" class="t-dim" font-size="24">Power BI + 52 DAX</text><text x="2380" y="235" text-anchor="middle" class="t-mono" font-size="20">powerbi/*.pbip</text>
+      <rect class="boxy" x="2640" y="80" width="360" height="200" rx="20"/><text x="2820" y="150" text-anchor="middle" font-weight="600">7. Findings</text><text x="2820" y="195" text-anchor="middle" class="t-dim" font-size="24">10 insights, 10 actions</text><text x="2820" y="235" text-anchor="middle" class="t-mono" font-size="20">insights/</text>
+      <rect class="boxy" x="3080" y="80" width="360" height="200" rx="20"/><text x="3260" y="150" text-anchor="middle" font-weight="600">8. Present</text><text x="3260" y="195" text-anchor="middle" class="t-dim" font-size="24">10 slides</text><text x="3260" y="235" text-anchor="middle" class="t-mono" font-size="20">presentation/</text>
+      <path class="lna" d="M362,180 H436" marker-end="url(#ar)"/><path class="lna" d="M802,180 H876" marker-end="url(#ar)"/><path class="lna" d="M1242,180 H1316" marker-end="url(#ar)"/><path class="lna" d="M1682,180 H1756" marker-end="url(#ar)"/><path class="lna" d="M2122,180 H2196" marker-end="url(#ar)"/><path class="lna" d="M2562,180 H2636" marker-end="url(#ar)"/><path class="lna" d="M3002,180 H3076" marker-end="url(#ar)"/>
+      <path class="ln dash" d="M1060,282 V340 H2380 V286" marker-end="url(#ar)"/><text x="1720" y="372" text-anchor="middle" class="t-dim" font-size="22">Power BI reads the clean CSV files directly (or the database)</text>
+      <text x="1060" y="50" text-anchor="middle" class="t-dim" font-size="22">+ Excel checks · Power Query does the same rules</text>
+    </g>
+  </svg>
+  </div>
+  <div class="row" style="margin-top:40px">
+    <div class="card w2"><span class="tag">Step 0 · Business case</span><h3>Define the question first</h3><p><strong>What:</strong> problem, stakeholders, KPI definitions (e.g. AOV = sales ÷ orders).</p><p><strong>Why:</strong> every report must mean the same thing. Start with the question, not the chart.</p></div>
+    <div class="card w2"><span class="tag">Step 1 · Create data</span><h3>A realistic pretend shop</h3><p><strong>What:</strong> 89,528 orders, 185,858 order lines, 12,500 customers, 1,220 products, 24 stores + online, 2 years.</p><p><strong>Why:</strong> no real company data, so we simulate one with real patterns (Christmas, sales, online growth).</p></div>
+    <div class="card w2"><span class="tag">Step 2 · Make it messy</span><h3>Break it in 37 counted ways</h3><p><strong>What:</strong> duplicates, "Web" vs "WEB", dates like 30 Feb, negative quantities, missing prices.</p><p><strong>Why:</strong> real data is messy; cleaning is a key interview skill. Counting the mess means we can prove the cleaning works.</p></div>
+    <div class="card w2"><span class="tag">Step 3 · Clean it</span><h3>Fix · flag · quarantine</h3><p><strong>What:</strong> 40 rules, each logged with a row count. 90 bad sales rows set aside (0.05%).</p><p><strong>Why:</strong> wrong data → wrong decisions. Result: 100% of cleaned lines match the answer key.</p></div>
+    <div class="card w2"><span class="tag">Step 4 · Database</span><h3>PostgreSQL star schema</h3><p><strong>What:</strong> 8 tables with keys and rules (quantity 1–20, net = gross − discount). 13 automatic checks, all PASS.</p><p><strong>Why:</strong> the database itself refuses bad data, and every tool reads one source.</p></div>
+    <div class="card w2"><span class="tag">Step 5 · SQL</span><h3>40 business questions</h3><p><strong>What:</strong> from "sales by category" to "which loyal customers stopped buying".</p><p><strong>Why:</strong> SQL is the #1 analyst interview skill. Each answer is saved and explained.</p></div>
+    <div class="card w2"><span class="tag">Step 6 · Power BI</span><h3>5 interactive pages</h3><p><strong>What:</strong> Executive, Sales, Profit, Customers, Returns; 52 DAX measures; filters on every page.</p><p><strong>Why:</strong> managers click and filter themselves instead of waiting for reports.</p></div>
+    <div class="card w2"><span class="tag">Steps 7–8 · Findings &amp; slides</span><h3>Turn numbers into decisions</h3><p><strong>What:</strong> 10 insights (Finding → Evidence → Cause → Impact → Action → Outcome), impact-vs-effort ranking, 10 slides.</p><p><strong>Why:</strong> charts alone don't help managers. Decisions do.</p></div>
+  </div>
+</section>
+
+<!-- 03 DATA MODEL -->
+<section class="zone span2" id="z3" data-name="03 Data model (UML)">
+  <header><span class="num">03</span><div><h2>Data model: the star schema (UML / ER diagram)</h2><p class="sub">Numbers in the middle (facts). Descriptions around them (dimensions). 1 = one, * = many.</p></div></header>
+  <div class="card full">
+  <svg viewBox="0 0 1640 1200" role="img" aria-label="Star schema: FactSales and FactReturns linked to six dimension tables">
+    <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+    <g font-size="21">
+      <!-- relationship lines first: each one ends at the matching FK row -->
+      <path class="ln" d="M420,165 C520,165 520,185 620,185"/>
+      <path class="ln" d="M420,545 C520,545 520,218 620,218"/>
+      <path class="ln" d="M420,925 C520,925 520,251 620,251"/>
+      <path class="ln" d="M1220,165 C1120,165 1120,284 1020,284"/>
+      <path class="ln" d="M1220,545 C1120,545 1120,317 1020,317"/>
+      <path class="ln" d="M1220,925 C1120,925 1120,350 1020,350"/>
+      <path class="ln" style="opacity:.5" d="M420,200 C560,200 540,799 620,799"/>
+      <path class="lna dash" d="M420,235 C590,235 560,834 620,834"/>
+      <path class="ln" style="opacity:.5" d="M420,580 C540,580 540,869 620,869"/>
+      <path class="ln" style="opacity:.5" d="M420,960 C540,960 540,876 620,876"/>
+      <path class="ln" style="opacity:.5" d="M1220,200 C1100,200 1100,904 1020,904"/>
+      <path class="ln" style="opacity:.5" d="M1220,580 C1100,580 1100,911 1020,911"/>
+      <path class="ln" style="opacity:.5" d="M1220,960 C1100,960 1100,939 1020,939"/>
+      <text x="428" y="155" class="t-dim">1</text><text x="600" y="178" class="t-dim">*</text>
+      <text x="478" y="1180" class="t-dim" font-size="19">dark lines: FactSales · light lines: FactReturns · dashed: inactive order-date link</text>
+      <!-- dims left -->
+      <rect class="box" x="60" y="40" width="360" height="300" rx="14"/><rect class="head" x="60" y="40" width="360" height="52" rx="14"/><text x="80" y="75" class="t-head" font-size="24">DimDate</text>
+      <text x="80" y="125" class="t-mono">PK DateKey</text><text x="80" y="160" class="t-mono">Date, Year, Quarter</text><text x="80" y="195" class="t-mono">MonthName, YearMonth</text><text x="80" y="230" class="t-mono">IsWeekend, BankHoliday</text><text x="80" y="265" class="t-mono">UKFinancialYear</text><text x="80" y="300" class="t-mono">TradingPeriod</text>
+      <rect class="box" x="60" y="420" width="360" height="300" rx="14"/><rect class="head" x="60" y="420" width="360" height="52" rx="14"/><text x="80" y="455" class="t-head" font-size="24">DimCustomer</text>
+      <text x="80" y="505" class="t-mono">PK CustomerKey (−1 Guest)</text><text x="80" y="540" class="t-mono">CustomerID</text><text x="80" y="575" class="t-mono">Segment, AgeBand</text><text x="80" y="610" class="t-mono">City, PostcodeDistrict</text><text x="80" y="645" class="t-mono">LoyaltyMember</text><text x="80" y="680" class="t-mono">FirstPurchaseDate</text>
+      <rect class="box" x="60" y="800" width="360" height="300" rx="14"/><rect class="head" x="60" y="800" width="360" height="52" rx="14"/><text x="80" y="835" class="t-head" font-size="24">DimProduct</text>
+      <text x="80" y="885" class="t-mono">PK ProductKey</text><text x="80" y="920" class="t-mono">SKU, ProductName</text><text x="80" y="955" class="t-mono">Category, SubCategory</text><text x="80" y="990" class="t-mono">Brand, IsOwnLabel</text><text x="80" y="1025" class="t-mono">UnitCost, ListPrice</text><text x="80" y="1060" class="t-mono">PriceBand</text>
+      <!-- dims right -->
+      <rect class="box" x="1220" y="40" width="360" height="300" rx="14"/><rect class="head" x="1220" y="40" width="360" height="52" rx="14"/><text x="1240" y="75" class="t-head" font-size="24">DimStore</text>
+      <text x="1240" y="125" class="t-mono">PK StoreKey</text><text x="1240" y="160" class="t-mono">StoreCode, StoreName</text><text x="1240" y="195" class="t-mono">StoreType, City</text><text x="1240" y="230" class="t-mono">SizeSqFt, OpenDate</text><text x="1240" y="265" class="t-mono">IsOnline</text><text x="1240" y="300" class="t-mono">IsLikeForLike</text>
+      <rect class="box" x="1220" y="420" width="360" height="300" rx="14"/><rect class="head" x="1220" y="420" width="360" height="52" rx="14"/><text x="1240" y="455" class="t-head" font-size="24">DimChannel</text>
+      <text x="1240" y="505" class="t-mono">PK ChannelKey</text><text x="1240" y="540" class="t-mono">ChannelName</text><text x="1240" y="575" class="t-mono">(In-Store, Website,</text><text x="1240" y="610" class="t-mono"> Mobile App,</text><text x="1240" y="645" class="t-mono"> Click &amp; Collect)</text><text x="1240" y="680" class="t-mono">ChannelType</text>
+      <rect class="box" x="1220" y="800" width="360" height="300" rx="14"/><rect class="head" x="1220" y="800" width="360" height="52" rx="14"/><text x="1240" y="835" class="t-head" font-size="24">DimRegion</text>
+      <text x="1240" y="885" class="t-mono">PK RegionKey</text><text x="1240" y="920" class="t-mono">RegionCode</text><text x="1240" y="955" class="t-mono">RegionName</text><text x="1240" y="990" class="t-mono">Nation</text><text x="1240" y="1025" class="t-dim">12 UK regions</text>
+      <!-- facts -->
+      <rect class="boxa" x="620" y="40" width="400" height="560" rx="16"/><rect class="head" x="620" y="40" width="400" height="56" rx="16"/><text x="640" y="77" class="t-head" font-size="26">FactSales  (185,858 rows)</text>
+      <text x="640" y="125" class="t-mono">PK SalesLineKey</text><text x="640" y="158" class="t-mono">OrderID, LineNumber</text><text x="640" y="191" class="t-mono">FK DateKey</text><text x="640" y="224" class="t-mono">FK CustomerKey</text><text x="640" y="257" class="t-mono">FK ProductKey</text><text x="640" y="290" class="t-mono">FK StoreKey</text><text x="640" y="323" class="t-mono">FK ChannelKey</text><text x="640" y="356" class="t-mono">FK RegionKey</text>
+      <text x="640" y="395" class="t-mono">Quantity, UnitPrice</text><text x="640" y="428" class="t-mono">DiscountPct</text><text x="640" y="461" class="t-mono">GrossSales, Discount</text><text x="640" y="494" class="t-mono">NetSales (= revenue)</text><text x="640" y="527" class="t-mono">CostAmount</text><text x="640" y="560" class="t-mono">GrossProfit</text>
+      <rect class="boxa" x="620" y="680" width="400" height="440" rx="16"/><rect class="head" x="620" y="680" width="400" height="56" rx="16"/><text x="640" y="717" class="t-head" font-size="26">FactReturns  (14,120 rows)</text>
+      <text x="640" y="770" class="t-mono">PK ReturnKey</text><text x="640" y="805" class="t-mono">FK DateKey (return)</text><text x="640" y="840" class="t-mono">FK OrderDateKey (order)</text><text x="640" y="875" class="t-mono">FK Customer, Product</text><text x="640" y="910" class="t-mono">FK Store, Channel</text><text x="640" y="945" class="t-mono">FK RegionKey</text><text x="640" y="985" class="t-mono">ReturnQty</text><text x="640" y="1020" class="t-mono">RefundAmount</text><text x="640" y="1055" class="t-mono">ReturnReason</text><text x="640" y="1090" class="t-mono">DaysToReturn</text>
+    </g>
+  </svg>
+  </div>
+  <div class="row" style="margin-top:40px">
+    <div class="card sticky y w2"><h3>Grain = what one row means</h3><p>FactSales: <strong>one product line in one order</strong>. Count orders with DISTINCTCOUNT(OrderID), never row count.</p></div>
+    <div class="card sticky g r w2"><h3>Keys</h3><p><strong>PK Primary key</strong> = unique ID. <strong>→ Foreign key</strong> = points to a dimension. <strong>Surrogate key</strong> = simple number we create (fast, stable).</p></div>
+    <div class="card sticky b w2"><h3>Guest = −1</h3><p>In-store shoppers with no loyalty card get CustomerKey −1. No sale is lost, and no "(Blank)" shows in slicers.</p></div>
+    <div class="card sticky p r w2"><h3>Two dates on returns</h3><p>Return date = active link. Order date = <strong>inactive (dashed)</strong>, switched on in DAX with USERELATIONSHIP.</p></div>
+    <div class="card w2"><h3>Why Region is on the fact</h3><p>Online orders ship from one hub with no region. Region = store region (in-store) or delivery region (online). One clear filter path, so no ambiguity.</p></div>
+    <div class="card w2"><h3>Why a star schema?</h3><p>Each description is stored once, Power BI is fastest with it, and it's simple: <strong>filter by dimensions, add up facts</strong>.</p></div>
+  </div>
+</section>
+
+<!-- 04 SEQUENCE + DECISION -->
+<section class="zone" id="z4" data-name="04 Sequence & decisions (UML)">
+  <header><span class="num">04</span><div><h2>Who does what, in what order</h2><p class="sub">UML sequence diagram + the cleaning decision flow.</p></div></header>
+  <div class="card full">
+  <h3>Sequence: running the project</h3>
+  <svg viewBox="0 0 1500 1240" role="img" aria-label="Sequence diagram from you to Python, files, PostgreSQL, Power BI and the manager">
+    <defs><marker id="ar3" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+    <g font-size="22">
+      <g text-anchor="middle" font-weight="600">
+        <rect class="boxa" x="20" y="20" width="200" height="70" rx="12"/><text x="120" y="63">You</text>
+        <rect class="boxa" x="270" y="20" width="200" height="70" rx="12"/><text x="370" y="63">Python</text>
+        <rect class="boxa" x="520" y="20" width="200" height="70" rx="12"/><text x="620" y="63">CSV files</text>
+        <rect class="boxa" x="770" y="20" width="200" height="70" rx="12"/><text x="870" y="63">PostgreSQL</text>
+        <rect class="boxa" x="1020" y="20" width="200" height="70" rx="12"/><text x="1120" y="63">Power BI</text>
+        <rect class="boxa" x="1270" y="20" width="200" height="70" rx="12"/><text x="1370" y="63">Manager</text>
+      </g>
+      <path class="life" d="M120,90 V1220 M370,90 V1220 M620,90 V1220 M870,90 V1220 M1120,90 V1220 M1370,90 V1220"/>
+      <path class="ln" d="M120,150 H364" marker-end="url(#ar3)"/><text x="130" y="140">1 run 01_generate</text>
+      <path class="ln" d="M370,210 H614" marker-end="url(#ar3)"/><text x="380" y="200">writes raw sales</text>
+      <path class="ln" d="M120,290 H364" marker-end="url(#ar3)"/><text x="130" y="280">2 run 02_inject</text>
+      <path class="ln" d="M370,350 H614" marker-end="url(#ar3)"/><text x="380" y="340">messy raw CSVs</text>
+      <path class="ln" d="M120,430 H364" marker-end="url(#ar3)"/><text x="130" y="420">3 run 03_clean</text>
+      <path class="ln" d="M370,490 H614" marker-end="url(#ar3)"/><text x="380" y="480">clean star schema</text>
+      <path class="ln dash" d="M614,530 H376" marker-end="url(#ar3)"/><text x="400" y="560" class="t-dim">+ cleaning log, quarantine</text>
+      <path class="ln" d="M120,620 H864" marker-end="url(#ar3)"/><text x="130" y="610">4 load tables (sql/01, 02)</text>
+      <path class="ln" d="M620,680 H864" marker-end="url(#ar3)"/><text x="630" y="670">read clean CSVs</text>
+      <path class="ln dash" d="M864,740 H126" marker-end="url(#ar3)"/><text x="400" y="770" class="t-dim">13 checks: PASS</text>
+      <path class="ln" d="M120,840 H864" marker-end="url(#ar3)"/><text x="130" y="830">5 run 40 SQL questions</text>
+      <path class="ln dash" d="M864,890 H126" marker-end="url(#ar3)"/><text x="400" y="920" class="t-dim">answers + results file</text>
+      <path class="ln" d="M120,990 H1114" marker-end="url(#ar3)"/><text x="130" y="980">6 open .pbip → Refresh</text>
+      <path class="ln" d="M1114,1040 H626" marker-end="url(#ar3)"/><text x="680" y="1030">read clean CSVs (DataFolder)</text>
+      <path class="ln" d="M1370,1120 H1126" marker-end="url(#ar3)"/><text x="1150" y="1110">7 click filter</text>
+      <path class="ln dash" d="M1126,1180 H1364" marker-end="url(#ar3)"/><text x="1140" y="1215" class="t-dim">DAX recalculates visuals</text>
+    </g>
+  </svg>
+  </div>
+  <div class="card full" style="margin-top:40px">
+  <h3>Activity: what to do with a bad value?</h3>
+  <svg viewBox="0 0 1500 900" role="img" aria-label="Decision flow: keep, fix, flag or quarantine">
+    <defs><marker id="ar4" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker></defs>
+    <g font-size="24">
+      <rect class="boxy" x="560" y="20" width="380" height="80" rx="40"/><text x="750" y="70" text-anchor="middle" font-weight="600">Bad / odd value found</text>
+      <path class="ln" d="M750,100 V150" marker-end="url(#ar4)"/>
+      <polygon class="box" points="750,155 1010,240 750,325 490,240"/><text x="750" y="235" text-anchor="middle">Is the blank or odd</text><text x="750" y="265" text-anchor="middle">value legitimate?</text>
+      <path class="ln" d="M1010,240 H1150" marker-end="url(#ar4)"/><text x="1030" y="225" class="t-dim">yes</text>
+      <rect class="boxg" x="1155" y="190" width="320" height="100" rx="14"/><text x="1315" y="232" text-anchor="middle" font-weight="600">KEEP</text><text x="1315" y="268" text-anchor="middle" font-size="20">blank customer = Guest</text>
+      <path class="ln" d="M750,325 V375" marker-end="url(#ar4)"/><text x="765" y="358" class="t-dim">no</text>
+      <polygon class="box" points="750,380 1010,465 750,550 490,465"/><text x="750" y="460" text-anchor="middle">Is the right value</text><text x="750" y="490" text-anchor="middle">certain?</text>
+      <path class="ln" d="M1010,465 H1150" marker-end="url(#ar4)"/><text x="1030" y="450" class="t-dim">yes</text>
+      <rect class="boxg" x="1155" y="415" width="320" height="100" rx="14"/><text x="1315" y="457" text-anchor="middle" font-weight="600">FIX</text><text x="1315" y="493" text-anchor="middle" font-size="20">"WEB" → "Website"</text>
+      <path class="ln" d="M750,550 V600" marker-end="url(#ar4)"/><text x="765" y="583" class="t-dim">no</text>
+      <polygon class="box" points="750,605 1010,690 750,775 490,690"/><text x="750" y="685" text-anchor="middle">Usable with a</text><text x="750" y="715" text-anchor="middle">clear estimate?</text>
+      <path class="ln" d="M1010,690 H1150" marker-end="url(#ar4)"/><text x="1030" y="675" class="t-dim">yes</text>
+      <rect class="boxy" x="1155" y="640" width="320" height="100" rx="14"/><text x="1315" y="682" text-anchor="middle" font-weight="600">FIX + FLAG</text><text x="1315" y="718" text-anchor="middle" font-size="20">missing price, marked Y</text>
+      <path class="ln" d="M490,690 H350" marker-end="url(#ar4)"/><text x="400" y="675" class="t-dim">no</text>
+      <rect class="boxp" x="25" y="640" width="320" height="100" rx="14"/><text x="185" y="682" text-anchor="middle" font-weight="600">QUARANTINE</text><text x="185" y="718" text-anchor="middle" font-size="20">date "30 Feb 2024"</text>
+      <text x="750" y="860" text-anchor="middle" class="t-dim">Every action writes one line to the cleaning log (rule ID + row count)</text>
+    </g>
+  </svg>
+  </div>
+</section>
+
+<!-- 05 CODE -->
+<section class="zone span3" id="z5" data-name="05 Code snippets explained">
+  <header><span class="num">05</span><div><h2>The important code, explained line by line</h2><p class="sub">You don't need all 4,600 lines. These are the parts interviewers ask about. Full guide: CODE_GUIDE.md</p></div></header>
+  <div class="row">
+    <div class="card" style="width:2580px"><div class="codewrap">
+      <div><span class="file">sql/04_business_questions.sql · Q03 (line 47)</span>
+<pre><span class="mk">1</span>SELECT p.category,
+<span class="mk">2</span>       ROUND(SUM(s.net_sales), 0) AS revenue,
+<span class="mk">3</span>       ROUND(100 * SUM(s.net_sales)
+         / SUM(SUM(s.net_sales)) OVER (), 1) AS revenue_share_pct,
+       ROUND(SUM(s.gross_profit), 0) AS gross_profit,
+<span class="mk">4</span>       ROUND(100 * SUM(s.gross_profit)
+         / SUM(s.net_sales), 1) AS margin_pct
+<span class="mk">5</span>FROM fact_sales s
+<span class="mk">6</span>JOIN dim_product p ON p.product_key = s.product_key
+<span class="mk">7</span>GROUP BY p.category
+<span class="mk">8</span>ORDER BY revenue DESC;</pre></div>
+      <div><h3>Which categories make money?</h3><ol class="callouts"><li>Show the category name as the row label.</li><li><code>SUM</code> adds up sales for each category pile.</li><li><code>SUM(SUM()) OVER ()</code> = grand total on every row (window function), so each category ÷ total = its share.</li><li>Margin = total profit ÷ total sales. Never average a margin column.</li><li>Start with the sales table (185,858 rows). <code>s</code> is a nickname.</li><li>Look up each sale's category in the product table, like an Excel VLOOKUP.</li><li>Make 8 piles, one per category.</li><li>Biggest sales first.</li></ol><p style="margin-top:18px"><strong>Result:</strong> Electronics = 19.3% of sales but 5.9% of profit (13% margin).</p><p class="lbl">The database runs it in this order: FROM → JOIN → GROUP BY → SELECT → ORDER BY</p></div>
+    </div></div>
+    <div class="card" style="width:2580px"><div class="codewrap">
+      <div><span class="file">sql/04_business_questions.sql · Q25 (line 379)</span>
+<pre><span class="mk">1</span>WITH m AS (
+    SELECT d.year, d.month_number, d.month_short,
+           SUM(s.net_sales) AS revenue
+    FROM fact_sales s JOIN dim_date d ON d.date_key = s.date_key
+    GROUP BY d.year, d.month_number, d.month_short
+),
+<span class="mk">2</span>w AS (
+    SELECT *, LAG(revenue, 12)
+              OVER (ORDER BY year, month_number) AS revenue_ly
+    FROM m
+)
+<span class="mk">3</span>SELECT month_short, revenue_ly AS revenue_2024,
+       revenue AS revenue_2025,
+       ROUND(100 * (revenue / revenue_ly - 1), 1) AS revenue_yoy_pct
+FROM w
+<span class="mk">4</span>WHERE year = 2025;</pre></div>
+      <div><h3>Year-over-year growth for each month</h3><ol class="callouts"><li><strong>CTE</strong> (<code>WITH m AS</code>): a named temporary table holding one row per month with its sales.</li><li><code>LAG(revenue, 12)</code> looks 12 rows back, which is the same month last year. That's a <strong>window function</strong>.</li><li>Growth % = this year ÷ last year − 1.</li><li>Show only 2025 rows, where a "last year" exists.</li></ol><p style="margin-top:18px"><strong>Result:</strong> sales grew every month, but profit fell in January (−11%) and July (−4%), the sale months.</p></div>
+    </div></div>
+    <div class="card" style="width:2580px"><div class="codewrap">
+      <div><span class="file">dax/measures.dax · Power BI formulas</span>
+<pre><span class="mk">1</span>Revenue = SUM ( FactSales[NetSales] )
+<span class="mk">2</span>Gross Profit = [Revenue] - [Cost]
+<span class="mk">3</span>Gross Margin % = DIVIDE ( [Gross Profit], [Revenue] )
+<span class="mk">4</span>Orders = DISTINCTCOUNT ( FactSales[OrderID] )
+<span class="mk">5</span>Customers =
+    CALCULATE ( DISTINCTCOUNT ( FactSales[CustomerKey] ),
+                DimCustomer[IsGuest] = "N" )
+<span class="mk">6</span>Revenue PY =
+    CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+<span class="mk">7</span>Revenue YoY % = DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )</pre></div>
+      <div><h3>Measures recalculate for whatever is filtered</h3><ol class="callouts"><li>Add up sales for the current filter (a year, a region, a bar you clicked).</li><li>Measures can use other measures.</li><li><code>DIVIDE</code> = safe division (blank instead of an error when sales are 0).</li><li>Count each order once, because one order has many lines.</li><li><code>CALCULATE</code> = "calculate, but change the filter": leave out anonymous Guest shoppers.</li><li>Same dates, one year back. Needs the date table marked as a date table.</li><li>Growth vs last year.</li></ol><p style="margin-top:18px"><strong>Filter context:</strong> written once, but Power BI calculates it separately for every bar, card and slicer choice.</p></div>
+    </div></div>
+    <div class="card" style="width:2580px"><div class="codewrap">
+      <div><span class="file">scripts/03_clean_data.py · sales cleaning (line ~309)</span>
+<pre><span class="mk">1</span>s = s.drop_duplicates()
+<span class="mk">2</span>CHANNEL_MAP = {"web": "Website", "website": "Website",
+               "app": "Mobile App", "instore": "In-Store",
+               "c&amp;c": "Click &amp; Collect", ...}
+s["Channel"] = s["Channel"].str.lower().map(CHANNEL_MAP)
+<span class="mk">3</span>assert s["Channel"].notna().all()
+<span class="mk">4</span>s = quarantine(s, s["Quantity"] &lt;= 0, "sales_transactions",
+               "SA-06", "Negative quantity")
+<span class="mk">5</span>fix = s["DiscountPct"] &gt; 1
+s.loc[fix, "DiscountPct"] = s.loc[fix, "DiscountPct"] / 100
+<span class="mk">6</span>record("SA-09", "sales_transactions",
+       "Discount entered as whole number", fix.sum())</pre></div>
+      <div><h3>Every rule: check → fix or set aside → log it</h3><ol class="callouts"><li>Remove exact copies (a batch was loaded twice, which would double sales).</li><li>14 spellings of channels → 4 standard names. "WEB" → "web" → "Website".</li><li><code>assert</code> stops the program if any spelling wasn't mapped. Nothing slips through silently.</li><li>Negative quantities are refunds typed as sales, so they're set aside in a quarantine file.</li><li>"20" means 20%, so divide by 100.</li><li>Write one line to the cleaning log: rule ID + how many rows.</li></ol><p style="margin-top:18px"><strong>Pattern:</strong> the 683-line file is this small pattern repeated for each table, plus building the star schema.</p></div>
+    </div></div>
+    <div class="card" style="width:2580px"><div class="codewrap">
+      <div><span class="file">sql/01_create_schema.sql · the table rules</span>
+<pre><span class="mk">1</span>CREATE TABLE fact_sales (
+    sales_line_key INTEGER PRIMARY KEY,
+<span class="mk">2</span>    product_key INTEGER NOT NULL
+        REFERENCES dim_product(product_key),
+<span class="mk">3</span>    quantity SMALLINT NOT NULL CHECK (quantity BETWEEN 1 AND 20),
+    discount_pct NUMERIC(5,4) CHECK (discount_pct BETWEEN 0 AND 0.6),
+    net_sales NUMERIC(12,2) NOT NULL,
+<span class="mk">4</span>    UNIQUE (order_id, order_line_number),
+<span class="mk">5</span>    CHECK (net_sales = gross_sales - discount_amount)
+);</pre></div>
+      <div><h3>The database protects itself</h3><ol class="callouts"><li>Each row has a unique ID (primary key).</li><li><strong>Foreign key</strong>: a sale can't point to a product that doesn't exist.</li><li><strong>CHECK</strong>: quantity must be 1–20, discount 0–60%.</li><li>No duplicate order lines.</li><li>Maths must add up: net = gross − discount.</li></ol><p style="margin-top:18px"><strong>Real story:</strong> these rules caught 3 bugs while building, including sales dated before a product's launch.</p></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- 06 DASHBOARD UI -->
+<section class="zone span3" id="z6" data-name="06 Dashboard screens">
+  <header><span class="num">06</span><div><h2>The dashboard screens, and how each one works</h2><p class="sub">5 Power BI pages, one per audience. Filters at the top work on every page. (Images are layout mockups; the real Power BI pages match this layout.)</p></div></header>
+  <div class="shots">
+    <div class="card full"><div class="shot"><img src="img/mockup_page1_executive_overview.jpg" alt="Executive overview page mockup"><div><span class="tag">Page 1 · for CEO &amp; CFO</span><h3>Executive Overview: "How are we doing vs last year?"</h3><ol class="callouts"><li><strong>Filters (top right):</strong> Year, Region, Channel, Category. Pick one and every visual updates.</li><li><strong>7 KPI cards:</strong> Revenue, Gross Profit, Margin %, Orders, AOV, Customers, Return Rate. Each is one DAX measure.</li><li><strong>Revenue by month:</strong> line chart, 2024 (grey) vs 2025 (blue). Legend = DimDate[Year].</li><li><strong>Margin by month:</strong> shows profit per £1 falling, worst in sale months (Jan, Jul, Nov).</li><li><strong>Revenue by channel:</strong> click a bar to filter the whole page to that channel.</li><li><strong>Margin by category:</strong> Electronics stands out in orange (lowest).</li><li><strong>Check:</strong> the year table must show £3,961,750 (2024) and £4,584,138 (2025).</li></ol></div></div></div>
+    <div class="card full"><div class="shot"><img src="img/mockup_page2_sales_performance.jpg" alt="Sales performance page mockup"><div><span class="tag">Page 2 · for retail &amp; e-commerce heads</span><h3>Sales Performance: "Where does revenue come from?"</h3><ol class="callouts"><li><strong>Revenue by region:</strong> sorted bar chart. London is the biggest (20%).</li><li><strong>Monthly revenue by channel:</strong> the app line grows fastest (+49%).</li><li><strong>Top stores:</strong> uses the measure Revenue (Physical Stores), so the online hub is excluded.</li><li><strong>Products table:</strong> sorted by revenue, with margin beside it, so best sellers with weak profit are visible.</li><li><strong>Like-for-like:</strong> stores open both years grew only +5.3%, which headline growth hides.</li></ol></div></div></div>
+    <div class="card full"><div class="shot"><img src="img/mockup_page3_profitability.jpg" alt="Profitability page mockup"><div><span class="tag">Page 3 · for CFO &amp; category managers</span><h3>Profitability: "Where is margin lost?"</h3><ol class="callouts"><li><strong>Cards:</strong> Margin %, change in points, discount given, profit lost on lines sold below cost.</li><li><strong>Margin by discount band:</strong> 46% with no discount, 6% at 40%+. Uses the calculated column Discount Band.</li><li><strong>Product scatter / table:</strong> Electronics products cluster at low margin.</li><li><strong>Margin by trading period:</strong> Black Friday, January and Boxing Day sales are the least profitable.</li><li><strong>Store margin league:</strong> Bluewater Outlet and Newcastle sit far below the rest.</li></ol></div></div></div>
+    <div class="card full"><div class="shot"><img src="img/mockup_page4_customers.jpg" alt="Customer analytics page mockup"><div><span class="tag">Page 4 · for marketing &amp; CRM</span><h3>Customer Analytics: "Who are our valuable customers?"</h3><ol class="callouts"><li><strong>Cards:</strong> customers (Guests excluded with CALCULATE), revenue per customer, repeat %, guest share of store sales (~32%).</li><li><strong>Revenue per customer by segment:</strong> Premium spends about 2.7× more than Value.</li><li><strong>New vs returning by month:</strong> about 93% of orders come from returning customers.</li><li><strong>RFM segments:</strong> Champions = 55% of revenue; "At risk" = 1,450 loyal customers who stopped buying.</li><li><strong>Channel mix by age:</strong> younger customers shop more on the website and app.</li></ol></div></div></div>
+    <div class="card full"><div class="shot"><img src="img/mockup_page5_returns.jpg" alt="Returns page mockup"><div><span class="tag">Page 5 · for customer service &amp; buying team</span><h3>Returns: "What comes back, why, from which supplier?"</h3><ol class="callouts"><li><strong>Return rate by order month:</strong> uses the order-date measure (USERELATIONSHIP). The last month looks low only because returns haven't arrived yet (return lag).</li><li><strong>By category:</strong> footwear 15%, clothing 13%, beauty 1.5%.</li><li><strong>By reason:</strong> "Wrong size / fit" dominates clothes and shoes; "Faulty" dominates electronics.</li><li><strong>Margin before vs after refunds:</strong> website margin drops from 40% to 28%.</li><li><strong>Brands table:</strong> Stride Lab jumped from 10% to 28% returns in 2025.</li></ol></div></div></div>
+  </div>
+</section>
+
+<!-- 07 INSIGHT CHARTS -->
+<section class="zone span2" id="z7" data-name="07 Insight charts">
+  <header><span class="num">07</span><div><h2>The evidence: key charts and what they mean</h2><p class="sub">Every chart comes from a SQL query (Qxx). Read: what it shows → so what.</p></div></header>
+  <div class="row">
+    <figure class="card imgc" style="margin:0"><img src="img/09_margin_bridge.jpg" alt="Margin bridge chart"><figcaption><strong>Why margin fell 2.4 points (Q37).</strong> −0.8 from more discounting, −1.6 from costs rising faster than prices. → Protect margin, don't just chase sales.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/02_category_revenue_vs_profit.jpg" alt="Category revenue vs profit chart"><figcaption><strong>Revenue share vs profit share (Q03).</strong> Electronics: big seller, small profit. → Review Electronics prices, costs, discounts.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/03_discount_vs_margin.jpg" alt="Discount vs margin chart"><figcaption><strong>Margin by discount (Q09).</strong> 46% → 6% as discounts deepen. → Set a maximum discount per category.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/04_channel_growth.jpg" alt="Channel growth chart"><figcaption><strong>Growth by channel (Q04).</strong> App +49%, stores +4%. → Growth is digital; invest in the app.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/06_online_apparel_return_trend.jpg" alt="Online apparel return trend"><figcaption><strong>Online clothes &amp; shoes returns (Q39).</strong> ~16% → ~27%. Last month is incomplete (return lag). → Add size guides.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/07_brand_return_rates.jpg" alt="Brand return rates"><figcaption><strong>Returns by brand (Q19).</strong> Stride Lab 10% → 28%, 83% "wrong size". → Raise it with the supplier.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/08_store_margin.jpg" alt="Store margin league"><figcaption><strong>Store margin (Q14).</strong> Newcastle discounts like an outlet. → Central approval for local promotions.</figcaption></figure>
+    <figure class="card imgc" style="margin:0"><img src="img/11_impact_effort_matrix.jpg" alt="Impact vs effort matrix"><figcaption><strong>Impact vs effort.</strong> Quick wins first: discount limits, Stride Lab fix, win-back campaign. Illustrative total ~£120–140K profit/year.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 08 PRESENTATION -->
+<section class="zone" id="z8" data-name="08 The 10 slides">
+  <header><span class="num">08</span><div><h2>The 10-slide presentation</h2><p class="sub">The whole story in about 8 minutes. presentation/NorthStar_Executive_Presentation.pptx</p></div></header>
+  <div class="slides">
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-01.jpg" alt="Slide 1"><figcaption>1 · The problem: sales up, profit not</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-02.jpg" alt="Slide 2"><figcaption>2 · What leadership asked for</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-03.jpg" alt="Slide 3"><figcaption>3 · The data and star schema</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-04.jpg" alt="Slide 4"><figcaption>4 · Data quality before vs after</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-05.jpg" alt="Slide 5"><figcaption>5 · Sales: growth is digital</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-06.jpg" alt="Slide 6"><figcaption>6 · Profit: why margin fell</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-07.jpg" alt="Slide 7"><figcaption>7 · Customers: loyal core at risk</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-08.jpg" alt="Slide 8"><figcaption>8 · Returns: one supplier</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-09.jpg" alt="Slide 9"><figcaption>9 · Five key insights</figcaption></figure>
+    <figure class="slide card" style="margin:0;padding:18px"><img src="img/slide-10.jpg" alt="Slide 10"><figcaption>10 · Recommendations</figcaption></figure>
+  </div>
+</section>
+
+<!-- 09 SCENARIOS -->
+<section class="zone span2" id="z9" data-name="09 Scenarios: what if…">
+  <header><span class="num">09</span><div><h2>Scenarios: what happens if…?</h2><p class="sub">Use these to show you really understand how the parts connect.</p></div></header>
+  <div class="row">
+    <div class="card sticky b w2"><span class="tag">Technical</span><h3>A new spelling appears ("Webshop")</h3><p>The CHANNEL_MAP has no match → <code>assert</code> stops the cleaning script with the unknown value shown. Add it to the map, re-run. Nothing wrong reaches the dashboard.</p></div>
+    <div class="card sticky b r w2"><span class="tag">Technical</span><h3>A batch is loaded twice</h3><p>Rule SA-01 removes exact duplicates, and the database's UNIQUE(order, line) rule refuses any that slip through. Revenue never doubles.</p></div>
+    <div class="card sticky b w2"><span class="tag">Technical</span><h3>The data folder moves (e.g. to D:)</h3><p>Power BI shows "Could not find a part of the path". Fix: Transform data → Edit parameters → DataFolder = the new path ending with <code>\</code> → Apply changes.</p></div>
+    <div class="card sticky b r w2"><span class="tag">Technical</span><h3>Next month's data arrives</h3><p>Drop the new extracts in <code>data/raw</code> → run <code>03_clean_data.py</code> → reload SQL → Refresh in Power BI. Same rules every time, which is why it's scripted, not done by hand.</p></div>
+    <div class="card sticky g w2"><span class="tag">Business</span><h3>Manager selects "North East"</h3><p>Every visual filters to that region. Margin drops to 38.6%, and the store chart shows why: Newcastle Eldon Square's heavy discounting.</p></div>
+    <div class="card sticky g r w2"><span class="tag">Business</span><h3>Cap Electronics discounts at 15%</h3><p>2025 lines at ≥20% off made −£24.7K profit. At 15% off, losing 30% of those sales → about +£28K profit a year (illustrative, assumptions stated).</p></div>
+    <div class="card sticky g w2"><span class="tag">Business</span><h3>December's return rate looks great</h3><p>It isn't. Those orders haven't had time to come back (return lag). Never judge the latest month's returns at face value.</p></div>
+    <div class="card sticky g r w2"><span class="tag">Business</span><h3>"Total growth is +15.7%, stores are fine"</h3><p>Not quite. Like-for-like stores grew only +5.3%; the new Sheffield store and online growth flatter the headline.</p></div>
+  </div>
+</section>
+
+<!-- 10 TOOLS -->
+<section class="zone" id="z10" data-name="10 Tools used and why">
+  <header><span class="num">10</span><div><h2>Tools used and why</h2></div></header>
+  <div class="card full"><table>
+    <thead><tr><th>Tool</th><th>Used for</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Python</strong><br>pandas, numpy</td><td>Create, break and clean the data; build charts, Excel, slides</td><td>Repeatable: same result every run</td></tr>
+      <tr><td><strong>PostgreSQL</strong></td><td>The database</td><td>Free and professional, enforces rules</td></tr>
+      <tr><td><strong>SQL</strong></td><td>40 business questions</td><td>#1 analyst skill</td></tr>
+      <tr><td><strong>Excel</strong></td><td>Quick checks: XLOOKUP, SUMIFS, pivots</td><td>Every business uses it</td></tr>
+      <tr><td><strong>Power Query</strong></td><td>Same cleaning rules inside Power BI</td><td>Refresh without Python</td></tr>
+      <tr><td><strong>Power BI + DAX</strong></td><td>Interactive dashboard, 52 measures</td><td>Top BI tool in UK adverts</td></tr>
+      <tr><td><strong>Git + GitHub</strong></td><td>Store and share the project</td><td>Recruiters look here</td></tr>
+      <tr><td><strong>VS Code</strong></td><td>Read the code with colours</td><td>Free, easy</td></tr>
+    </tbody></table></div>
+</section>
+
+<!-- 11 WHERE THE CODE IS -->
+<section class="zone" id="z11" data-name="11 Where the code is">
+  <header><span class="num">11</span><div><h2>Where the code is</h2><p class="sub">Colour = how important it is for interviews.</p></div></header>
+  <div class="card full">
+<pre style="font-size:21px;line-height:1.75">uk-retail-sales-bi-dashboard/
+├─ <strong>PROJECT_GUIDE.html</strong>   start here (open in browser)
+├─ <strong>CODE_GUIDE.md</strong>        how to read the code
+├─ business-analysis/   the problem &amp; KPIs
+├─ scripts/
+│   ├─ 01_generate_data.py      ● know what it does
+│   ├─ 02_inject_quality…py     ● know what it does
+│   ├─ <strong>03_clean_data.py</strong>         ●● explain the rules
+│   └─ helpers/                 ○ builds output files
+├─ sql/
+│   ├─ <strong>01_create_schema.sql</strong>     ●●● must explain
+│   ├─ 02_load_data.sql
+│   ├─ 03_data_quality_checks.sql
+│   ├─ <strong>04_business_questions.sql</strong> ●●● must explain
+│   └─ README.md   every answer explained
+├─ dax/<strong>measures.dax</strong>           ●●● must explain
+├─ power-query/   M cleaning code
+├─ powerbi/       <strong>…Dashboard.pbip</strong> (open this)
+├─ excel/  presentation/  screenshots/
+├─ insights/      findings + actions
+├─ documentation/ data dictionary, rules
+├─ notes/         study notes + 50 questions
+└─ portfolio/     CV lines, LinkedIn post</pre>
+  </div>
+  <div class="card sticky y" style="margin-top:30px"><h3>See it with colours</h3><p><strong>GitHub website:</strong> click any folder, then any file. <strong>VS Code:</strong> File → Open Folder. Press <code>Ctrl+K</code> then <code>Ctrl+0</code> to fold a long file to its headings; <code>Ctrl+G</code> jumps to a line number.</p></div>
+</section>
+
+<!-- 12 RUN -->
+<section class="zone span2" id="z12" data-name="12 Run it on a laptop">
+  <header><span class="num">12</span><div><h2>How to run it on a laptop</h2><p class="sub">4 levels. Level 1 and 2 are enough to see everything working.</p></div></header>
+  <div class="row">
+    <div class="card w2"><span class="tag">Level 1 · 15 min · no installs</span><h3>Get it &amp; see results</h3><ol><li>GitHub → green <strong>Code</strong> → <strong>Download ZIP</strong>.</li><li>Extract to <code>C:\NorthStar\</code>.</li><li>In <code>data</code>, extract <code>clean_data.zip</code> <strong>here</strong>.</li><li>Open the presentation, the Excel file, the screenshots.</li></ol></div>
+    <div class="card w2"><span class="tag">Level 2 · 30 min · Windows</span><h3>Open the Power BI dashboard</h3><ol><li>Install <strong>Power BI Desktop</strong> (Microsoft Store). Close the sign-in box; no account needed.</li><li>Open <code>powerbi\NorthStar_Retail_Dashboard.pbip</code>.</li><li>Transform data ▸ <strong>Edit parameters</strong> ▸ DataFolder = your <code>…\data\clean\</code> path.</li><li><strong>Apply changes</strong> / Refresh. Check page 1: £3,961,750 / £4,584,138.</li></ol></div>
+    <div class="card w2"><span class="tag">Level 3 · 1 hour</span><h3>Run the SQL</h3><ol><li>Install <strong>PostgreSQL</strong> (includes pgAdmin).</li><li>Create database <code>northstar</code>.</li><li>Query Tool: run <code>sql\01_create_schema.sql</code>.</li><li>Each table → <strong>Import/Export Data</strong> → CSV from <code>data\clean</code>, Header on. Dimensions first, then fact_sales, then fact_returns.</li><li>Run <code>03</code> (all PASS) then <code>04</code>.</li></ol></div>
+    <div class="card w2"><span class="tag">Level 4 · 1 hour</span><h3>Run the Python</h3><ol><li>Install Python (tick "Add to PATH").</li><li>VS Code → Terminal: <code>pip install pandas numpy matplotlib openpyxl python-pptx</code></li><li><code>python scripts\01_generate_data.py</code>, then 02, then 03.</li><li>Optional: <code>python scripts\helpers\build_….py</code> to rebuild the outputs.</li></ol></div>
+    <div class="card sticky p w4"><h3>The #1 problem you'll hit: the folder path</h3><p>If Power BI says <em>"Could not find a part of the path"</em>, search File Explorer for <code>fact_sales.csv</code> → right-click → Open file location → copy the address bar. On your laptop it was <code>D:\Northstar\uk-retail-sales-bi-dashboard\data\clean\</code>. No quotation marks, and keep the <code>\</code> at the end.</p></div>
+  </div>
+</section>
+
+<!-- 13 SEND -->
+<section class="zone" id="z13" data-name="13 Send it to your brother">
+  <header><span class="num">13</span><div><h2>How to send it</h2></div></header>
+  <div class="row">
+    <div class="card full"><h3>Best: give him the GitHub project</h3><ol><li>GitHub project → <strong>Settings</strong>.</li><li>Scroll down → <strong>Transfer ownership</strong>.</li><li>Type his GitHub username → confirm.</li><li>He accepts from his email. It appears on his profile, which recruiters see.</li></ol></div>
+    <div class="card full"><h3>Or send files</h3><p>Send the project ZIP (~21 MB) by Google Drive, WeTransfer or USB stick. He follows Level 1.</p></div>
+    <div class="card sticky y full"><h3>Share the guides</h3><p>Share this whiteboard and the guide page from the <strong>Share</strong> menu. They're private until you do. A copy of the guide is also in the project: <code>PROJECT_GUIDE.html</code>.</p></div>
+  </div>
+</section>
+
+<!-- 14 EXPLAIN -->
+<section class="zone span2" id="z14" data-name="14 How to explain it">
+  <header><span class="num">14</span><div><h2>How to explain it</h2><p class="sub">Three versions, depending on who is listening.</p></div></header>
+  <div class="row">
+    <div class="card sticky g w3"><span class="tag">Family / friends · 20 seconds</span><p class="say">"I built a system for a pretend shop chain that sells more every year but doesn't make more money. It fixes the mistakes in their data and shows on one screen where money is made and lost: too many discounts, electronics barely profitable, and one shoe brand sent back because of wrong sizes."</p></div>
+    <div class="card sticky b r w3"><span class="tag">Interview · 30 seconds</span><p class="say">"I built an end-to-end retail analytics project for a simulated UK retailer: generated two years of realistic data, cleaned it with 40 documented rules, built a star schema in PostgreSQL, answered 40 business questions in SQL, and built a 5-page Power BI dashboard with DAX. Revenue grew 15.7% but profit only 9.4% because of discounting and weak Electronics margins, and I turned that into prioritised recommendations."</p></div>
+    <div class="card w4"><span class="tag">Interview · 2 minutes · STAR</span><table><tbody>
+      <tr><td><strong>Situation</strong></td><td>Simulated UK retailer, four reports that disagree; sales up but nobody knows where profit is lost.</td></tr>
+      <tr><td><strong>Task</strong></td><td>Build one trusted source of numbers; explain what, why, where, and what to do.</td></tr>
+      <tr><td><strong>Action</strong></td><td>Defined KPIs first → realistic data with real-world mess → 40 cleaning rules (fix / flag / quarantine) → star schema with database rules → 40 SQL analyses → Power BI with 52 DAX measures → reconciled SQL, Excel and Power BI totals.</td></tr>
+      <tr><td><strong>Result</strong></td><td>Margin −2.4 pts (1.6 costs, 0.8 discounts); Electronics loses money above ~19% discount; one shoe supplier tripled returns. Recommended discount limits, supplier action and a win-back campaign, ranked by impact vs effort.</td></tr>
+    </tbody></table></div>
+    <div class="card sticky p w4"><h3>Always say honestly</h3><p>"It's a simulated project with synthetic data, so it shows my skills, not work experience, and the money figures are estimates with stated assumptions." Never claim a real company or real savings.</p></div>
+  </div>
+</section>
+
+<!-- 15 INTERVIEW -->
+<section class="zone span2" id="z15" data-name="15 Interview questions">
+  <header><span class="num">15</span><div><h2>Interview questions, with answers</h2><p class="sub">Practise out loud in your own words. 50 more in notes/14_interview_question_bank.md</p></div></header>
+  <div class="row">
+    <div class="card qa"><h3>Is this real data?</h3><p>No. A simulated UK retailer with synthetic data I generated, with realistic patterns. The methods are what I'd use on real data.</p></div>
+    <div class="card qa"><h3>Why a star schema?</h3><p>Descriptions stored once, simple for users, fastest in Power BI: filter by dimensions, add up facts.</p></div>
+    <div class="card qa"><h3>What's the grain?</h3><p>One row per order line. Orders = DISTINCTCOUNT(OrderID), not a row count.</p></div>
+    <div class="card qa"><h3>WHERE vs HAVING?</h3><p>WHERE filters rows before grouping; HAVING filters groups after totals are calculated.</p></div>
+    <div class="card qa"><h3>How did you get YoY growth?</h3><p>SQL: monthly CTE + LAG(revenue, 12). DAX: CALCULATE([Revenue], SAMEPERIODLASTYEAR(DimDate[Date])), then DIVIDE.</p></div>
+    <div class="card qa"><h3>What does CALCULATE do?</h3><p>Calculates a measure with changed filters, e.g. Customers without the anonymous Guests.</p></div>
+    <div class="card qa"><h3>A data-quality problem you solved?</h3><p>14 spellings of 4 channels, two date formats, a double-loaded batch. Mapping table, explicit date formats, de-duplication: validity 92% → 100%, only 0.05% set aside.</p></div>
+    <div class="card qa"><h3>Did you delete blank customers?</h3><p>No. Blank = no loyalty card in store, which is legitimate, worth £1.36M. Kept as a Guest member.</p></div>
+    <div class="card qa"><h3>How do you know the numbers are right?</h3><p>One reconciliation total (£8,545,888) every tool must match, 13 automatic database checks, and SQL vs Excel vs Power BI compared.</p></div>
+    <div class="card qa"><h3>Most important insight?</h3><p>Profit grew far slower than sales. I split the 2.4-point margin fall into cost inflation (1.6) and discounting (0.8).</p></div>
+    <div class="card qa"><h3>30% off everything on Black Friday?</h3><p>Electronics breaks even at ~19% off, so 30% loses money on every unit. Use category limits and test in a few regions.</p></div>
+    <div class="card qa"><h3>How did you use AI?</h3><p>"As a mentor and coding assistant. I ran everything, checked every number, and can explain any part. Pick a query and I'll walk you through it."</p></div>
+  </div>
+</section>
+
+<!-- 16 NEXT -->
+<section class="zone" id="z16" data-name="16 What to do next">
+  <header><span class="num">16</span><div><h2>What to do next</h2></div></header>
+  <div class="card full"><ul class="check">
+    <li><strong>Today:</strong> finish Level 2. Power BI showing real numbers.</li>
+    <li><strong>This week:</strong> screenshot the 5 pages into <code>screenshots/</code>.</li>
+    <li><strong>This week:</strong> transfer the GitHub project to your brother.</li>
+    <li><strong>Brother, weeks 1–3:</strong> study plan in <code>notes/00_START_HERE.md</code>.</li>
+    <li><strong>Brother:</strong> rebuild page 1 by hand (<code>powerbi/00_SIMPLE_STEPS.md</code>, Way 2).</li>
+    <li><strong>Brother:</strong> re-type Q03, Q09, Q25 and 5 DAX measures from memory.</li>
+    <li><strong>Then:</strong> add the CV lines and LinkedIn post from <code>portfolio/</code>.</li>
+  </ul></div>
+  <div class="card sticky g r" style="margin-top:30px"><h3>One-hour teaching session</h3><ol><li>Draw the pipeline (zone 02).</li><li>Show the star schema (zone 03).</li><li>Explain 3 SQL queries (zone 05).</li><li>Explain 4 DAX measures.</li><li>Click through the dashboard (zone 06).</li><li>Practise 5 interview answers (zone 15).</li></ol></div>
+</section>
+
+<div class="foot">NorthStar Retail UK is a fictional company · all data simulated · portfolio project whiteboard</div>
+</div>
+</div>
+
+<script>
+(function () {
+  var view = document.getElementById('view'), board = document.getElementById('board');
+  var pct = document.getElementById('pct'), jump = document.getElementById('jump');
+  var s = 0.25, x = 0, y = 0, MIN = 0.06, MAX = 2.5;
+  function apply() { board.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')'; pct.textContent = Math.round(s * 100) + '%'; }
+  function zoomAt(f, cx, cy) {
+    var ns = Math.min(MAX, Math.max(MIN, s * f)); f = ns / s;
+    x = cx - (cx - x) * f; y = cy - (cy - y) * f; s = ns; apply();
+  }
+  function bw() { return board.offsetWidth; } function bh() { return board.offsetHeight; }
+  function fitAll() {
+    var vw = view.clientWidth, vh = view.clientHeight - 70;
+    s = Math.min(vw / bw(), vh / bh()) * 0.98; x = (vw - bw() * s) / 2; y = 70; apply();
+  }
+  function fitWidthTop() { var vw = view.clientWidth; s = vw / bw(); x = 0; y = 60; apply(); }
+  function goTo(el, animate) {
+    var vw = view.clientWidth, vh = view.clientHeight - 70;
+    var r = { l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+    var ns = Math.min(MAX, vw / (r.w + 80), Math.max(vh / (r.h + 80), Math.min(0.55, vw / (r.w + 80))));
+    s = Math.max(MIN, ns); x = (vw - r.w * s) / 2 - r.l * s; y = 80 - r.t * s + 10;
+    if (animate) { board.classList.add('anim'); setTimeout(function () { board.classList.remove('anim'); }, 400); }
+    apply();
+  }
+  document.querySelectorAll('.zone').forEach(function (z) {
+    var o = document.createElement('option'); o.value = z.id; o.textContent = z.dataset.name; jump.appendChild(o);
+  });
+  var first = document.createElement('option'); first.value = ''; first.textContent = 'Jump to section…'; jump.insertBefore(first, jump.firstChild); jump.value = '';
+  jump.addEventListener('change', function () { if (jump.value) { goTo(document.getElementById(jump.value), true); } });
+  document.getElementById('zoomIn').onclick = function () { zoomAt(1.25, view.clientWidth / 2, view.clientHeight / 2); };
+  document.getElementById('zoomOut').onclick = function () { zoomAt(0.8, view.clientWidth / 2, view.clientHeight / 2); };
+  document.getElementById('fit').onclick = function () { fitAll(); jump.value = ''; };
+
+  view.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) { zoomAt(Math.exp(-e.deltaY * 0.0025), e.clientX, e.clientY); }
+    else { x -= e.deltaX; y -= e.deltaY; apply(); }
+  }, { passive: false });
+
+  var pts = new Map(), last = null, moved = 0, pinch = null;
+  view.addEventListener('pointerdown', function (e) {
+    view.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    moved = 0; view.classList.add('dragging');
+    if (pts.size === 2) { var a = Array.from(pts.values()); pinch = { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) }; }
+    last = { x: e.clientX, y: e.clientY };
+  });
+  view.addEventListener('pointermove', function (e) {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 2 && pinch) {
+      var a = Array.from(pts.values()), d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+      zoomAt(d / pinch.d, (a[0].x + a[1].x) / 2, (a[0].y + a[1].y) / 2); pinch.d = d; moved += 10; return;
+    }
+    var dx = e.clientX - last.x, dy = e.clientY - last.y; moved += Math.abs(dx) + Math.abs(dy);
+    x += dx; y += dy; last = { x: e.clientX, y: e.clientY }; apply();
+  });
+  function end(e) {
+    var wasClick = moved < 6 && pts.size === 1;
+    pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
+    if (pts.size === 0) view.classList.remove('dragging');
+    if (wasClick && e.type === 'pointerup' && s < 0.35) {
+      var z = document.elementFromPoint(e.clientX, e.clientY); z = z && z.closest('.zone'); if (z) goTo(z, true);
+    }
+    if (pts.size === 1) { last = Array.from(pts.values())[0]; }
+  }
+  view.addEventListener('pointerup', end); view.addEventListener('pointercancel', end);
+  window.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === '+' || e.key === '=') zoomAt(1.25, view.clientWidth / 2, view.clientHeight / 2);
+    if (e.key === '-') zoomAt(0.8, view.clientWidth / 2, view.clientHeight / 2);
+    if (e.key === '0') fitAll();
+    var step = 120; if (e.key === 'ArrowLeft') { x += step; apply(); } if (e.key === 'ArrowRight') { x -= step; apply(); }
+    if (e.key === 'ArrowUp') { y += step; apply(); } if (e.key === 'ArrowDown') { y -= step; apply(); }
+  });
+  window.addEventListener('resize', fitWidthTop);
+  fitWidthTop();
+  window.addEventListener('load', fitWidthTop);
+  window.__wb = { goTo: goTo, fitAll: fitAll, set: function (ns, nx, ny) { s = ns; x = nx; y = ny; apply(); } };
+})();
+</script>

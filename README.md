@@ -65,6 +65,7 @@ Date, Customer, Product, Store, Region, Channel. → [`documentation/data_model.
 | [`insights/`](insights) | 10 insights (Finding → Evidence → Cause → Impact → Recommendation → Outcome), prioritised recommendations |
 | [`presentation/`](presentation) | 10-slide executive deck |
 | [`screenshots/`](screenshots) | Charts and dashboard page mockups |
+| [`whiteboard/`](whiteboard/index.html) | **Visual whiteboard** of the whole project: diagrams, annotated code, screens, scenarios, Q&A (open `index.html` in a browser) |
 | [`CODE_GUIDE.md`](CODE_GUIDE.md) | **How to read and explain the code**: what matters, in what order |
 | [`notes/`](notes/00_START_HERE.md) | **Study notes for every phase** + interview question bank |
 | [`portfolio/`](portfolio/case_study_cv_linkedin.md) | Case study, CV bullets, LinkedIn post |
