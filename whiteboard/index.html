@@ -158,7 +158,7 @@ svg .arrowa { fill: var(--accent); }
     <div class="card w1"><span class="big">−2.4p</span><span class="lbl">profit per £1 of sales<br>43.3% → 41.0% margin</span></div>
     <div class="card sticky g r full"><h3>The 5 findings</h3><ol><li><strong>Too many discounts</strong>: 30%+ discounts leave almost no profit.</li><li><strong>Electronics</strong>: 19% of sales, only 6% of profit; loses money above ~19% discount.</li><li><strong>Costs rose faster than prices</strong>: suppliers +6%, prices only +3%.</li><li><strong>Online returns rising</strong>: clothes &amp; shoes ~16% → ~27%, mostly one shoe brand (Stride Lab, wrong sizes).</li><li><strong>Two stores over-discount</strong>: Newcastle gives 3× the discount of other stores.</li></ol></div>
     <div class="card w2"><h3>Why employers care</h3><p>This is exactly what Data / BI Analysts do: messy data → clean → database → dashboard → decisions. It uses the tools UK adverts ask for: <strong>SQL, Power BI, DAX, Excel</strong>.</p></div>
-    <div class="card sticky p w2"><h3>How to use this board</h3><p>Read the zones in number order: <strong>01 → 16</strong>. Use <strong>Go to</strong> in the toolbar to jump. Zoom in on any card to read it.</p></div>
+    <div class="card sticky p w2"><h3>How to use this board</h3><p>Read the zones in number order: <strong>01 → 15</strong>. Use <strong>Go to</strong> in the toolbar to jump. Zoom in on any card to read it.</p></div>
   </div>
 </section>
 
@@ -545,7 +545,7 @@ s.loc[fix, "DiscountPct"] = s.loc[fix, "DiscountPct"] / 100
 </section>
 
 <!-- 15 INTERVIEW -->
-<section class="zone span2" id="z15" data-name="15 Interview questions">
+<section class="zone span3" id="z15" data-name="15 Interview questions">
   <header><span class="num">15</span><div><h2>Interview questions, with answers</h2><p class="sub">Practise out loud in your own words. 50 more in notes/14_interview_question_bank.md</p></div></header>
   <div class="row">
     <div class="card qa"><h3>Is this real data?</h3><p>No. A simulated UK retailer with synthetic data I generated, with realistic patterns. The methods are what I'd use on real data.</p></div>
@@ -561,21 +561,6 @@ s.loc[fix, "DiscountPct"] = s.loc[fix, "DiscountPct"] / 100
     <div class="card qa"><h3>30% off everything on Black Friday?</h3><p>Electronics breaks even at ~19% off, so 30% loses money on every unit. Use category limits and test in a few regions.</p></div>
     <div class="card qa"><h3>How did you use AI?</h3><p>"As a mentor and coding assistant. I ran everything, checked every number, and can explain any part. Pick a query and I'll walk you through it."</p></div>
   </div>
-</section>
-
-<!-- 16 NEXT -->
-<section class="zone" id="z16" data-name="16 What to do next">
-  <header><span class="num">16</span><div><h2>What to do next</h2></div></header>
-  <div class="card full"><ul class="check">
-    <li><strong>Today:</strong> finish Level 2. Power BI showing real numbers.</li>
-    <li><strong>This week:</strong> screenshot the 5 pages into <code>screenshots/</code>.</li>
-    <li><strong>This week:</strong> transfer the GitHub project to your brother.</li>
-    <li><strong>Brother, weeks 1–3:</strong> study plan in <code>notes/00_START_HERE.md</code>.</li>
-    <li><strong>Brother:</strong> rebuild page 1 by hand (<code>powerbi/00_SIMPLE_STEPS.md</code>, Way 2).</li>
-    <li><strong>Brother:</strong> re-type Q03, Q09, Q25 and 5 DAX measures from memory.</li>
-    <li><strong>Then:</strong> add the CV lines and LinkedIn post from <code>portfolio/</code>.</li>
-  </ul></div>
-  <div class="card sticky g r" style="margin-top:30px"><h3>One-hour teaching session</h3><ol><li>Draw the pipeline (zone 02).</li><li>Show the star schema (zone 03).</li><li>Explain 3 SQL queries (zone 05).</li><li>Explain 4 DAX measures.</li><li>Click through the dashboard (zone 06).</li><li>Practise 5 interview answers (zone 15).</li></ol></div>
 </section>
 
 <div class="foot">NorthStar Retail UK is a fictional company · all data simulated · portfolio project whiteboard</div>
