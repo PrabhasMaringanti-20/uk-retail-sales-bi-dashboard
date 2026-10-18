@@ -1,0 +1,378 @@
+<title>NorthStar Project Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field manual — sticky contents rail on the left, one readable column on the right; stacks on phones */
+:root {
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --ink: #14202e;
+  --ink-2: #4a5868;
+  --line: #d9e0e7;
+  --accent: #0f6e8c;      /* NorthStar teal-blue */
+  --accent-soft: #e2f0f5;
+  --warn: #8a5a00;
+  --warn-soft: #fbf1dc;
+  --code-bg: #eef2f6;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f151c; --surface: #16202a; --ink: #e6edf3; --ink-2: #a3b1bf; --line: #2a3744;
+  --accent: #5cc2e0; --accent-soft: #15303b; --warn: #f0c15c; --warn-soft: #2e2512; --code-bg: #1c2733; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f151c; --surface: #16202a; --ink: #e6edf3; --ink-2: #a3b1bf; --line: #2a3744;
+  --accent: #5cc2e0; --accent-soft: #15303b; --warn: #f0c15c; --warn-soft: #2e2512; --code-bg: #1c2733; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 40px; padding-block: 32px 64px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; font-size: 14px; }
+nav.toc p { font: 600 12px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: s; }
+nav.toc a { display: block; padding: 6px 10px; border-radius: 6px; color: var(--ink-2); text-decoration: none; counter-increment: s; }
+nav.toc a::before { content: counter(s) ". "; color: var(--accent); font-variant-numeric: tabular-nums; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); color: var(--ink); outline: none; }
+main { min-width: 0; }
+header.top { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 8px; }
+.eyebrow { font: 600 12px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 800 clamp(30px, 5vw, 44px)/1.1 var(--font-display); margin: 10px 0 12px; text-wrap: balance; }
+h2 { font: 600 clamp(22px, 3.2vw, 28px)/1.2 var(--font-display); margin: 56px 0 12px; text-wrap: balance; scroll-margin-top: 20px; }
+h3 { font: 600 18px/1.3 var(--font-body); margin: 28px 0 8px; }
+p, li { max-width: 68ch; }
+p { margin: 0 0 12px; }
+.lead { font-size: 18px; color: var(--ink-2); }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; margin: 0 0 12px; }
+li { margin-bottom: 6px; }
+strong { font-weight: 600; }
+code { font: 14px var(--font-mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.note { background: var(--warn-soft); border-left: 3px solid var(--warn); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; max-width: 72ch; }
+.note strong { color: var(--warn); }
+.tip { background: var(--accent-soft); padding: 12px 16px; border-radius: 8px; margin: 16px 0; max-width: 72ch; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.kpi b { display: block; font: 800 26px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 13px; color: var(--ink-2); }
+.table { overflow-x: auto; margin: 12px 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+.steps { counter-reset: st; list-style: none; padding: 0; display: grid; gap: 14px; margin: 16px 0; }
+.steps > li { counter-increment: st; position: relative; padding: 14px 16px 14px 56px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; max-width: none; }
+.steps > li::before { content: counter(st); position: absolute; left: 16px; top: 13px; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--surface); font: 600 14px/28px var(--font-body); text-align: center; }
+.steps > li > b:first-child { display: block; margin-bottom: 4px; }
+.code { position: relative; margin: 10px 0 18px; }
+.code pre { margin: 0; overflow-x: auto; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font: 13.5px/1.55 var(--font-mono); }
+.code .file { display: inline-block; font: 500 12px var(--font-mono); color: var(--ink-2); margin-bottom: 4px; }
+.copy { position: absolute; right: 8px; top: 8px; font: 500 12px var(--font-body); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cm { color: var(--ink-2); }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 10px 0; max-width: 80ch; }
+details summary { cursor: pointer; font-weight: 600; }
+details summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+details[open] summary { margin-bottom: 8px; }
+.say { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 12px 0; font-size: 17px; max-width: 70ch; }
+.levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+.level { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.level .tag { font: 600 12px/1 var(--font-body); color: var(--accent); letter-spacing: .06em; text-transform: uppercase; }
+.level h4 { margin: 6px 0 6px; font: 600 17px/1.3 var(--font-body); }
+.level p { font-size: 14px; color: var(--ink-2); margin: 0; }
+pre.mermaid { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow-x: auto; }
+footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  nav.toc { position: static; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  nav.toc ol { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <p>Contents</p>
+  <ol>
+    <li><a href="#what">What the project is</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#tools">Tools used and why</a></li>
+    <li><a href="#code">Where the code is</a></li>
+    <li><a href="#run">Run it on a laptop</a></li>
+    <li><a href="#send">Send it to your brother</a></li>
+    <li><a href="#explain">How to explain it</a></li>
+    <li><a href="#interview">Interview questions</a></li>
+    <li><a href="#plan">What to do next</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">UK Retail Sales &amp; BI Dashboard · complete guide</div>
+  <h1>NorthStar Retail: how the project works, how to run it, how to explain it</h1>
+  <p class="lead">One page that covers the whole project from start to finish, written in simple English. Read it top to bottom once, then use the contents list to jump back to any part.</p>
+  <p><strong>Project on GitHub:</strong> <a href="https://github.com/PrabhasMaringanti-20/uk-retail-sales-bi-dashboard">github.com/PrabhasMaringanti-20/uk-retail-sales-bi-dashboard</a></p>
+</header>
+
+<!-- 1 -->
+<h2 id="what">What the project is</h2>
+<p><strong>In one sentence:</strong> a pretend UK shop chain is selling more every year but not making more profit, and this project finds out why and what the managers should do about it.</p>
+<p>The shop is called <strong>NorthStar Retail UK</strong>. It is <strong>not a real company</strong>. All the data was created by a computer program so that it behaves like a real shop: busy Christmases, January sales, growing online orders, a shoe brand with sizing problems. Always say this openly in interviews.</p>
+
+<h3>The business problem</h3>
+<p>The managers get four different weekly reports (stores, website, finance, returns) and the numbers don't agree. Sales are going up, but nobody can say where the profit is being lost. The project builds <strong>one trusted set of numbers</strong> and a dashboard that answers: what is happening, why, where, and what to do.</p>
+
+<h3>What we found</h3>
+<div class="kpis">
+  <div class="kpi"><b>+15.7%</b><span>sales growth, 2024 → 2025<br>(£3.96M → £4.58M)</span></div>
+  <div class="kpi"><b>+9.4%</b><span>profit growth only</span></div>
+  <div class="kpi"><b>43.3% → 41.0%</b><span>profit per £1 of sales fell 2.4p</span></div>
+  <div class="kpi"><b>19% vs 6%</b><span>Electronics: share of sales vs share of profit</span></div>
+</div>
+<ul>
+  <li><strong>Too many discounts:</strong> discounts of 30% or more leave almost no profit. Electronics loses money on any discount above about 19%.</li>
+  <li><strong>Costs rose faster than prices:</strong> suppliers charged about 6% more, the shop raised prices only about 3%.</li>
+  <li><strong>Returns are rising online:</strong> online clothes and shoes returns went from about 16% to about 27%, mostly one shoe brand (Stride Lab) whose sizes are wrong.</li>
+  <li><strong>Two stores discount far too much:</strong> Newcastle gives three times more discount than the other stores.</li>
+  <li><strong>Loyal customers matter:</strong> 14% of customers bring in half the sales, and 1,450 of the loyal ones have stopped buying.</li>
+</ul>
+
+<h3>What it is used for (why employers care)</h3>
+<p>Real companies hire Data Analysts and BI Analysts to do exactly this: take messy data, clean it, put it in a database, build a dashboard, and turn numbers into decisions. This project shows your brother can do every one of those steps, with the same tools UK job adverts ask for: <strong>SQL, Power BI, DAX and Excel</strong>.</p>
+
+<!-- 2 -->
+<h2 id="how">How it works, step by step</h2>
+<p>The project is a chain. Each step takes the output of the step before it.</p>
+
+<pre class="mermaid">
+flowchart LR
+  A["1. Create pretend<br/>shop data<br/>(Python)"] --> B["2. Make it messy<br/>on purpose<br/>(Python)"]
+  B --> C["3. Clean it<br/>40 rules<br/>(Python)"]
+  C --> D[("4. Database<br/>PostgreSQL")]
+  D --> E["5. Ask 40 business<br/>questions<br/>(SQL)"]
+  C --> F["6. Dashboard<br/>Power BI + DAX"]
+  C --> X["Excel checks"]
+  E --> G["7. Findings &amp;<br/>recommendations"]
+  F --> G
+  G --> H["8. 10-slide<br/>presentation"]
+</pre>
+
+<div class="table"><table>
+<thead><tr><th>Step</th><th>What happens</th><th>Why we do it</th></tr></thead>
+<tbody>
+<tr><td><b>0. Business case</b></td><td>Wrote down the problem, who cares about it, and exactly what each number means (e.g. "average order value = sales ÷ number of orders").</td><td>So every report means the same thing. Start with the question, not the chart.</td></tr>
+<tr><td><b>1. Create data</b></td><td>A Python program creates 2 years of sales: 89,528 orders, 185,858 order lines, 12,500 customers, 1,220 products, 24 stores + online.</td><td>No real company data was available, so we simulated a realistic shop.</td></tr>
+<tr><td><b>2. Make it messy</b></td><td>Another program adds 37 kinds of mistakes: duplicates, "Web" vs "website", impossible dates like 30 February, negative quantities.</td><td>Real data is always messy. Cleaning it is a key skill interviewers test.</td></tr>
+<tr><td><b>3. Clean it</b></td><td>40 rules fix what can be fixed for sure, flag what is uncertain, and set aside ("quarantine") rows that can't be trusted. Every change is logged.</td><td>Wrong data gives wrong decisions. Logging every fix makes it trustworthy.</td></tr>
+<tr><td><b>4. Database</b></td><td>Clean data is loaded into PostgreSQL as a <b>star schema</b>: one big sales table in the middle, description tables (product, customer, store, date…) around it.</td><td>A database stores data once, enforces rules, and is fast to query.</td></tr>
+<tr><td><b>5. SQL questions</b></td><td>40 questions, from "total sales by category" to "which customers stopped buying".</td><td>SQL is the #1 skill in analyst interviews.</td></tr>
+<tr><td><b>6. Power BI</b></td><td>A 5-page interactive dashboard with 52 DAX formulas: Executive, Sales, Profit, Customers, Returns.</td><td>Managers click and filter themselves instead of asking for reports.</td></tr>
+<tr><td><b>7. Findings</b></td><td>10 insights and 10 recommendations, ranked by impact and effort.</td><td>Charts alone don't help. Decisions do.</td></tr>
+<tr><td><b>8. Presentation</b></td><td>10 slides that tell the story in about 8 minutes.</td><td>Analysts must explain results to non-technical managers.</td></tr>
+</tbody></table></div>
+
+<div class="tip"><strong>The star schema in simple words:</strong> think of a till receipt. The numbers (quantity, price, profit) go in the middle table called <code>FactSales</code>. The descriptions (product name, store city, customer type, month) go in smaller tables around it called <code>DimProduct</code>, <code>DimStore</code>, <code>DimCustomer</code>, <code>DimDate</code>. Drawn on paper, it looks like a star.</div>
+
+<!-- 3 -->
+<h2 id="tools">Tools used and why</h2>
+<div class="table"><table>
+<thead><tr><th>Tool</th><th>Used for</th><th>Why this tool</th></tr></thead>
+<tbody>
+<tr><td><b>Python</b> (pandas, numpy)</td><td>Creating the data, cleaning it, making charts, building the Excel file and slides</td><td>Repeatable: run the script again and get exactly the same result</td></tr>
+<tr><td><b>PostgreSQL</b></td><td>The database</td><td>Free, professional, used by real companies</td></tr>
+<tr><td><b>SQL</b></td><td>Asking the 40 business questions</td><td>The language every analyst job asks for</td></tr>
+<tr><td><b>Excel</b></td><td>Quick checks on one month of data (XLOOKUP, SUMIFS, pivots)</td><td>Every business uses Excel</td></tr>
+<tr><td><b>Power Query</b></td><td>The same cleaning rules inside Power BI / Excel</td><td>Lets business users refresh the data without Python</td></tr>
+<tr><td><b>Power BI + DAX</b></td><td>The interactive dashboard and its formulas</td><td>The most common BI tool in UK job adverts</td></tr>
+<tr><td><b>Git + GitHub</b></td><td>Storing and sharing the whole project</td><td>Recruiters look at GitHub to see real work</td></tr>
+<tr><td><b>VS Code</b> (to view code)</td><td>Opening and reading all the code files with colours</td><td>Free and easy to read code in</td></tr>
+</tbody></table></div>
+
+<!-- 4 -->
+<h2 id="code">Where the code is, and how to see it</h2>
+
+<h3>Folder map</h3>
+<div class="table"><table>
+<thead><tr><th>Folder</th><th>What's inside</th><th>Open with</th></tr></thead>
+<tbody>
+<tr><td><code>business-analysis/</code></td><td>The problem, goals, stakeholders, KPI definitions</td><td>GitHub website / VS Code</td></tr>
+<tr><td><code>scripts/</code></td><td><b>The Python programs</b>, numbered in the order they run (01 → 07)</td><td>VS Code</td></tr>
+<tr><td><code>data/</code></td><td>Raw messy data, clean data (<code>clean_data.zip</code>), the cleaning log</td><td>Excel (CSV files)</td></tr>
+<tr><td><code>sql/</code></td><td><b>The SQL code</b>: create tables, load data, 13 checks, 40 questions, results</td><td>VS Code / pgAdmin</td></tr>
+<tr><td><code>dax/</code></td><td><b>All 52 DAX formulas</b> + explanations</td><td>VS Code</td></tr>
+<tr><td><code>power-query/</code></td><td>Power Query (M) cleaning code</td><td>VS Code</td></tr>
+<tr><td><code>powerbi/</code></td><td><b>The dashboard</b>: <code>NorthStar_Retail_Dashboard.pbip</code></td><td>Power BI Desktop</td></tr>
+<tr><td><code>excel/</code></td><td>The Excel analysis workbook</td><td>Excel</td></tr>
+<tr><td><code>insights/</code></td><td>Findings report and recommendations</td><td>GitHub website</td></tr>
+<tr><td><code>presentation/</code></td><td>The 10-slide deck</td><td>PowerPoint</td></tr>
+<tr><td><code>screenshots/</code></td><td>Charts and dashboard pictures</td><td>Any image viewer</td></tr>
+<tr><td><code>documentation/</code></td><td>Data dictionary, data model, cleaning rules, quality report</td><td>GitHub website</td></tr>
+<tr><td><code>notes/</code></td><td><b>Study notes</b> for every step + interview questions</td><td>GitHub website</td></tr>
+<tr><td><code>portfolio/</code></td><td>CV bullet points, LinkedIn post, case study</td><td>GitHub website</td></tr>
+</tbody></table></div>
+
+<h3>Three ways to see the code visually</h3>
+<ol class="steps">
+  <li><b>Easiest: on the GitHub website (nothing to install)</b>Open the GitHub link at the top of this page and click any folder, then any file. Code shows with colours. Files ending in <code>.md</code> show as nicely formatted pages.</li>
+  <li><b>Best: in VS Code on your laptop</b>Install <a href="https://code.visualstudio.com/">Visual Studio Code</a> (free). Open it → <b>File → Open Folder</b> → choose the <code>uk-retail-sales-bi-dashboard</code> folder. All files appear on the left; click one to read it. To read a <code>.md</code> file nicely, open it and press <code>Ctrl + Shift + V</code>.</li>
+  <li><b>Just look: in Notepad</b>Right-click any <code>.py</code>, <code>.sql</code> or <code>.dax</code> file → Open with → Notepad. No colours, but it works.</li>
+</ol>
+
+<h3>A taste of each kind of code (what it does, in simple words)</h3>
+
+<p><strong>Python cleaning rule:</strong> the same channel was typed 14 different ways. This maps them all to 4 standard names.</p>
+<div class="code"><span class="file">scripts/03_clean_data.py</span>
+<pre>CHANNEL_MAP = {"in-store": "In-Store", "instore": "In-Store", "store": "In-Store",
+               "website": "Website",   "web": "Website",
+               "mobile app": "Mobile App", "app": "Mobile App",
+               "click &amp; collect": "Click &amp; Collect", "c&amp;c": "Click &amp; Collect"}
+s["Channel"] = s["Channel"].str.lower().map(CHANNEL_MAP)   <span class="cm"># "WEB" -> "web" -> "Website"</span></pre></div>
+
+<p><strong>SQL question:</strong> "How much did each category sell, and how much profit did it make?"</p>
+<div class="code"><span class="file">sql/04_business_questions.sql (Q03, simplified)</span>
+<pre>SELECT p.category,
+       SUM(s.net_sales)                        AS revenue,
+       SUM(s.gross_profit) / SUM(s.net_sales)  AS margin
+FROM   fact_sales s
+JOIN   dim_product p ON p.product_key = s.product_key   <span class="cm">-- bring in the category name</span>
+GROUP  BY p.category                                    <span class="cm">-- one row per category</span>
+ORDER  BY revenue DESC;</pre></div>
+
+<p><strong>DAX formula (Power BI):</strong> profit as a percentage of sales, and sales compared with last year.</p>
+<div class="code"><span class="file">dax/measures.dax</span>
+<pre>Gross Margin % = DIVIDE ( [Gross Profit], [Revenue] )
+Revenue PY     = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+Revenue YoY %  = DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )</pre></div>
+
+<!-- 5 -->
+<h2 id="run">How to run it on a laptop (yours or your brother's)</h2>
+<p>There are four levels. Do them in order. Level 1 and 2 are enough to see everything working.</p>
+
+<div class="levels">
+  <div class="level"><span class="tag">Level 1 · 15 min</span><h4>See the results</h4><p>Download and open the slides, Excel and pictures. Nothing to install.</p></div>
+  <div class="level"><span class="tag">Level 2 · 30 min</span><h4>Open the dashboard</h4><p>Install Power BI Desktop and load the data. Windows only.</p></div>
+  <div class="level"><span class="tag">Level 3 · 1 hour</span><h4>Run the SQL</h4><p>Install PostgreSQL and run the 40 questions yourself.</p></div>
+  <div class="level"><span class="tag">Level 4 · 1 hour</span><h4>Run the Python</h4><p>Re-create all the data and files from scratch.</p></div>
+</div>
+
+<h3>Level 1: get the project and see the results</h3>
+<ol class="steps">
+  <li><b>Download</b>Open the GitHub link → green <b>Code</b> button → <b>Download ZIP</b>.</li>
+  <li><b>Unzip to a simple place</b>Right-click the ZIP → <b>Extract All</b>. Put it at <code>C:\NorthStar\</code> so you get <code>C:\NorthStar\uk-retail-sales-bi-dashboard\</code>.</li>
+  <li><b>Unzip the data</b>Open <code>data</code> → right-click <code>clean_data.zip</code> → <b>Extract All</b> → extract <b>here</b>, into the <code>data</code> folder. You should now have <code>data\clean\fact_sales.csv</code>.</li>
+  <li><b>Look at the results</b>Open <code>presentation\NorthStar_Executive_Presentation.pptx</code> first, then <code>excel\NorthStar_Excel_Analysis.xlsx</code>, then the <code>screenshots</code> folder.</li>
+</ol>
+
+<h3>Level 2: open the Power BI dashboard</h3>
+<ol class="steps">
+  <li><b>Install Power BI Desktop</b>Free from the Microsoft Store. If it asks you to sign in, <b>close the window</b>. You don't need an account (a Gmail address is not accepted, and that's fine).</li>
+  <li><b>Open the dashboard</b>Double-click <code>powerbi\NorthStar_Retail_Dashboard.pbip</code>. The pages appear but the boxes say "(Blank)". That's normal: the data isn't loaded yet.</li>
+  <li><b>Tell Power BI where the data is</b>Home → arrow under <b>Transform data</b> → <b>Edit parameters</b> → <b>DataFolder</b>. Type the exact path of your <code>clean</code> folder, ending with <code>\</code>. Example: <code>C:\NorthStar\uk-retail-sales-bi-dashboard\data\clean\</code></li>
+  <li><b>Load the data</b>Click <b>Apply changes</b> (or <b>Refresh</b>). Wait about a minute.</li>
+  <li><b>Check it's right</b>On page 1 the year table must show <b>£3,961,750</b> for 2024 and <b>£4,584,138</b> for 2025. If it matches, everything works.</li>
+</ol>
+<div class="note"><strong>How to find the exact path of the data folder:</strong> open File Explorer, search for <code>fact_sales.csv</code>, right-click it → <b>Open file location</b>, then click the address bar at the top and copy the text. On your laptop it was on the D: drive: <code>D:\Northstar\uk-retail-sales-bi-dashboard\data\clean\</code>. No quotation marks, and keep the <code>\</code> at the end.</div>
+
+<h3>Level 3: run the SQL yourself</h3>
+<ol class="steps">
+  <li><b>Install PostgreSQL</b>Download from <a href="https://www.postgresql.org/download/windows/">postgresql.org</a>. The installer includes <b>pgAdmin</b>. Remember the password you choose.</li>
+  <li><b>Create the database</b>Open pgAdmin → right-click <b>Databases</b> → <b>Create → Database</b> → name it <code>northstar</code>.</li>
+  <li><b>Create the tables</b>Right-click <code>northstar</code> → <b>Query Tool</b> → open <code>sql\01_create_schema.sql</code> → press <b>F5</b> (run).</li>
+  <li><b>Load the data</b>In the left tree open northstar → Schemas → <b>northstar</b> → Tables. For each table: right-click → <b>Import/Export Data</b> → Import → pick the matching CSV from <code>data\clean\</code> → turn <b>Header</b> on → OK. Load in this order: <code>dim_date, dim_customer, dim_product, dim_region, dim_store, dim_channel</code>, then <code>fact_sales</code>, then <code>fact_returns</code>.</li>
+  <li><b>Run the checks and the 40 questions</b>Open and run <code>sql\03_data_quality_checks.sql</code> (all should say PASS), then <code>sql\04_business_questions.sql</code>. Compare your answers with <code>sql\README.md</code>, which explains every query.</li>
+</ol>
+
+<h3>Level 4: run the Python (create everything from scratch)</h3>
+<ol class="steps">
+  <li><b>Install Python</b>From <a href="https://www.python.org/downloads/">python.org</a>. On the first installer screen tick <b>"Add python.exe to PATH"</b>.</li>
+  <li><b>Open a terminal in the project</b>Open the project folder in VS Code → <b>Terminal → New Terminal</b>.</li>
+  <li><b>Install the libraries (once)</b><div class="code"><pre>pip install pandas numpy matplotlib openpyxl python-pptx</pre><button class="copy" type="button">Copy</button></div></li>
+  <li><b>Run the scripts in order</b><div class="code"><pre>python scripts\01_generate_data.py
+python scripts\02_inject_quality_issues.py
+python scripts\03_clean_data.py
+python scripts\04_build_charts.py
+python scripts\05_build_excel.py
+python scripts\06_build_presentation.py
+python scripts\07_build_powerbi_project.py</pre><button class="copy" type="button">Copy</button></div>Each one prints what it made. Because the data uses a fixed random seed, you get exactly the same numbers every time.</li>
+</ol>
+
+<!-- 6 -->
+<h2 id="send">How to send everything to your brother</h2>
+<ol class="steps">
+  <li><b>Best: give him the GitHub project</b>Open the GitHub link → <b>Settings</b> → scroll to the bottom → <b>Transfer ownership</b> → type his GitHub username → he accepts from his email. It then appears on his own GitHub profile, which is what recruiters see.</li>
+  <li><b>He downloads it on his laptop</b>He follows <a href="#run">Level 1</a> above on his own laptop.</li>
+  <li><b>Or send the ZIP directly</b>Send him the project ZIP by Google Drive, WeTransfer or a USB stick (about 21 MB, too big for some WhatsApp chats). He unzips it and follows Level 1.</li>
+  <li><b>Send him this guide</b>Share the link to this page. A copy also lives in the project as <code>PROJECT_GUIDE.html</code>; double-click it to open in any browser.</li>
+</ol>
+
+<!-- 7 -->
+<h2 id="explain">How to explain it to others</h2>
+
+<h3>To family or friends (non-technical)</h3>
+<p class="say">"I built a system for a pretend shop chain that sells more every year but doesn't make more money. It collects all their sales, fixes the mistakes in the data, and shows on one screen where money is made and lost. It showed they give away too much in discounts, electronics barely make money, and one brand of shoes keeps getting sent back because the sizes are wrong."</p>
+
+<h3>In an interview: 30 seconds</h3>
+<p class="say">"I built an end-to-end retail analytics project for a simulated UK retailer. I generated two years of realistic data, cleaned it with 40 documented rules, built a star schema in PostgreSQL, answered 40 business questions in SQL, and built a 5-page Power BI dashboard with DAX. The main finding was that revenue grew 15.7% but profit only 9.4%, because of discounting and weak Electronics margins. I turned that into prioritised recommendations."</p>
+
+<h3>In an interview: 2 minutes (Situation → Task → Action → Result)</h3>
+<ul>
+  <li><b>Situation:</b> a simulated UK retailer had four reports that disagreed. Sales were up but nobody knew where profit was lost.</li>
+  <li><b>Task:</b> build one trusted source of numbers and explain what's happening, why, and what to do.</li>
+  <li><b>Action:</b> defined the KPIs first; created realistic data and added real-world mess; cleaned it with 40 rules (fix if certain, flag if unsure, set aside if untrustworthy); built a star schema in PostgreSQL with built-in rules; wrote 40 SQL analyses; built the Power BI dashboard with 52 DAX measures; checked that SQL, Excel and Power BI all give the same totals.</li>
+  <li><b>Result:</b> profit per £1 fell 2.4p (1.6p from costs not passed on, 0.8p from more discounts); Electronics loses money above a ~19% discount; one shoe supplier tripled its returns. Recommended category discount limits, supplier action and a win-back campaign, ranked on an impact vs effort chart.</li>
+</ul>
+<div class="note"><strong>Always say this honestly:</strong> "It's a simulated project with synthetic data, so it shows my skills, not real work experience, and the money figures are estimates with stated assumptions." Interviewers respect honesty. Never claim it was a real company or that it saved real money.</div>
+
+<!-- 8 -->
+<h2 id="interview">Questions interviewers will ask (with answers)</h2>
+<p>Practise out loud. Use your own words; memorised answers sound memorised. The full list of 50 questions is in <code>notes/14_interview_question_bank.md</code>.</p>
+
+<details><summary>Is this real company data?</summary><p>No. It's a simulated UK retailer with synthetic data I generated, with realistic patterns built in. The methods are exactly what I'd use on real data.</p></details>
+<details><summary>Walk me through your project.</summary><p>Use the 2-minute answer above: problem → data → cleaning → database → SQL → dashboard → findings → recommendations.</p></details>
+<details><summary>Why did you use a star schema?</summary><p>Each description is stored once instead of repeated on 185,000 rows. It's simple for users (filter by descriptions, add up the numbers) and it's what Power BI is built to work fastest with.</p></details>
+<details><summary>What is the "grain" of your sales table?</summary><p>One row per order line: one product within one order. Orders are counted with a distinct count of the order number, not by counting rows.</p></details>
+<details><summary>What's the difference between WHERE and HAVING?</summary><p>WHERE filters rows before grouping. HAVING filters groups after the totals are calculated.</p></details>
+<details><summary>How did you calculate year-over-year growth?</summary><p>In SQL: monthly totals in a CTE, then <code>LAG(revenue, 12)</code> to get the same month last year. In DAX: <code>CALCULATE([Revenue], SAMEPERIODLASTYEAR(DimDate[Date]))</code>, then divide.</p></details>
+<details><summary>What does CALCULATE do in DAX?</summary><p>It calculates a measure with changed filters. For example, Customers = distinct customers, but with the anonymous "Guest" customers filtered out.</p></details>
+<details><summary>Tell me about a data quality problem you solved.</summary><p>Sales came with 14 different spellings of 4 channels, two date formats and a batch loaded twice. I used a mapping table, explicit date formats and duplicate removal. Validity went from 92% to 100%, only 0.05% of rows were set aside, and the cleaned revenue matched exactly.</p></details>
+<details><summary>Blank customer IDs: did you delete them?</summary><p>No. Blank means the shopper didn't scan a loyalty card in store. That's legitimate, worth £1.36M of sales. I kept them as a "Guest" customer instead of deleting real revenue.</p></details>
+<details><summary>How did you make sure your numbers were correct?</summary><p>One reconciliation total that every tool must match (£8,545,888 revenue), 13 automatic PASS/FAIL checks in the database, and comparing SQL, Excel and Power BI side by side.</p></details>
+<details><summary>What was your most important insight?</summary><p>Profit grew much slower than sales. I split the 2.4-point margin drop into costs rising faster than prices (1.6) and more discounting (0.8), which moved the conversation from "sell more" to "protect margin".</p></details>
+<details><summary>The CEO wants 30% off everything on Black Friday. What do you say?</summary><p>Electronics breaks even at about 19% off, so 30% off loses money on every electronics sale. I'd suggest different discount limits per category and test them in a few regions first.</p></details>
+<details><summary>How did you use AI in this project?</summary><p>Be honest: "I used AI as a mentor and coding assistant, like a senior colleague. I ran everything, checked every number against the database, and I can explain every decision." Then prove it by explaining any file they point at.</p></details>
+<details><summary>What would you do differently or add next?</summary><p>Add stock/inventory data, schedule automatic refreshes, publish the dashboard online, and test a discount change with a proper A/B test.</p></details>
+
+<!-- 9 -->
+<h2 id="plan">What to do next (checklist)</h2>
+<ol class="steps">
+  <li><b>Today</b>Finish Level 2: get the Power BI dashboard showing numbers. If any error appears, send a screenshot.</li>
+  <li><b>This week</b>Take screenshots of the 5 dashboard pages and put them in the <code>screenshots</code> folder. Transfer the GitHub project to your brother.</li>
+  <li><b>Your brother, weeks 1–3</b>Follow the study plan in <code>notes/00_START_HERE.md</code>. Most important: <code>notes/15_project_explained_simply.md</code>.</li>
+  <li><b>Your brother, practice</b>Rebuild Page 1 of the dashboard by hand (<code>powerbi/00_SIMPLE_STEPS.md</code>, "Way 2") and re-type 10 SQL queries from memory. Interviewers test real understanding.</li>
+  <li><b>Then</b>Add the CV bullet points and LinkedIn post from <code>portfolio/case_study_cv_linkedin.md</code>.</li>
+</ol>
+
+<footer>NorthStar Retail UK is a fictional company and all data is simulated. Portfolio project guide.</footer>
+</main>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = btn.parentElement.querySelector('pre');
+    var text = pre.innerText;
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Press Ctrl+C';
+    };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  });
+});
+</script>
