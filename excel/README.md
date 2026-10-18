@@ -1,6 +1,6 @@
 # Excel (Phase 5) — `NorthStar_Excel_Analysis.xlsx`
 
-Built by `scripts/05_build_excel.py`. Every number in the workbook is a **live formula**: change an input and it
+Built by `scripts/helpers/build_excel.py`. Every number in the workbook is a **live formula**: change an input and it
 recalculates. Opened and recalculated in LibreOffice to check the results (XLOOKUP needs Excel 2021/365 or
 LibreOffice 24.8+).
 

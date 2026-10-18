@@ -1,8 +1,8 @@
 """
 Phase 13 - 10-slide executive presentation (presentation/NorthStar_Executive_Presentation.pptx).
-Uses the charts from scripts/04_build_charts.py. Every number is taken from sql/README.md / insights.
+Uses the charts from scripts/helpers/build_charts.py. Every number is taken from sql/README.md / insights.
 
-Run:  python scripts/06_build_presentation.py
+Run:  python scripts/helpers/build_presentation.py
 """
 
 from pathlib import Path
@@ -13,7 +13,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 IMG = ROOT / "screenshots"
 OUT = ROOT / "presentation" / "NorthStar_Executive_Presentation.pptx"
 OUT.parent.mkdir(exist_ok=True)

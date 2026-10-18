@@ -9,7 +9,7 @@ Everything is generated from the clean CSVs and dax/measures.dax, so the model a
 the data and the documented measures. A validation step at the end checks that every column and
 measure used by a relationship, DAX expression or visual actually exists.
 
-Run:  python scripts/07_build_powerbi_project.py
+Run:  python scripts/helpers/build_powerbi_project.py
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CLEAN = ROOT / "data" / "clean"
 PBI = ROOT / "powerbi"
 NAME = "NorthStar_Retail_Dashboard"

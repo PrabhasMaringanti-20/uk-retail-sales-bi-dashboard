@@ -1,6 +1,6 @@
 # Notes 05 — Excel (Phase 5)
 
-**Files:** `excel/NorthStar_Excel_Analysis.xlsx`, `excel/README.md`, built by `scripts/05_build_excel.py`
+**Files:** `excel/NorthStar_Excel_Analysis.xlsx`, `excel/README.md`, built by `scripts/helpers/build_excel.py`
 
 ## In one line
 Excel is used for quick exploration and validation of a sample: lookups, conditional sums, checks and pivots.

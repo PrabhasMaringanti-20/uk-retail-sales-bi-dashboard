@@ -11,7 +11,7 @@ Sheets
   Raw_DQ        a sample of RAW (messy) rows with data-quality check formulas
   Pivot_Steps   how to build the PivotTables by hand
 
-Run:  python scripts/05_build_excel.py
+Run:  python scripts/helpers/build_excel.py
 """
 
 from pathlib import Path
@@ -23,7 +23,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CLEAN, RAW = ROOT / "data" / "clean", ROOT / "data" / "raw"
 OUT = ROOT / "excel" / "NorthStar_Excel_Analysis.xlsx"
 OUT.parent.mkdir(exist_ok=True)

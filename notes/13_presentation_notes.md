@@ -1,6 +1,6 @@
 # Notes 13 — Executive Presentation & Storytelling (Phase 13)
 
-**File:** `presentation/NorthStar_Executive_Presentation.pptx` (10 slides, built by `scripts/06_build_presentation.py`)
+**File:** `presentation/NorthStar_Executive_Presentation.pptx` (10 slides, built by `scripts/helpers/build_presentation.py`)
 
 ## In one line
 Executives want the answer first, then the evidence, then what to do. Ten slides, about 8 minutes.

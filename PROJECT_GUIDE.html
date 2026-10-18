@@ -201,7 +201,8 @@ flowchart LR
 <thead><tr><th>Folder</th><th>What's inside</th><th>Open with</th></tr></thead>
 <tbody>
 <tr><td><code>business-analysis/</code></td><td>The problem, goals, stakeholders, KPI definitions</td><td>GitHub website / VS Code</td></tr>
-<tr><td><code>scripts/</code></td><td><b>The Python programs</b>, numbered in the order they run (01 → 07)</td><td>VS Code</td></tr>
+<tr><td><code>scripts/</code></td><td><b>The Python programs</b>: 01 → 03 create and clean the data; <code>helpers/</code> only build the output files</td><td>VS Code</td></tr>
+<tr><td><code>CODE_GUIDE.md</code></td><td><b>How to read and explain the code</b>: which parts matter and in what order</td><td>GitHub website / VS Code</td></tr>
 <tr><td><code>data/</code></td><td>Raw messy data, clean data (<code>clean_data.zip</code>), the cleaning log</td><td>Excel (CSV files)</td></tr>
 <tr><td><code>sql/</code></td><td><b>The SQL code</b>: create tables, load data, 13 checks, 40 questions, results</td><td>VS Code / pgAdmin</td></tr>
 <tr><td><code>dax/</code></td><td><b>All 52 DAX formulas</b> + explanations</td><td>VS Code</td></tr>
@@ -223,6 +224,7 @@ flowchart LR
   <li><b>Just look: in Notepad</b>Right-click any <code>.py</code>, <code>.sql</code> or <code>.dax</code> file → Open with → Notepad. No colours, but it works.</li>
 </ol>
 
+<div class="tip"><strong>Don't read every line.</strong> Interviews test the SQL, the DAX and the cleaning decisions. <code>CODE_GUIDE.md</code> lists exactly which files and line numbers to read first, and how to fold a long file in VS Code (<code>Ctrl + K</code>, then <code>Ctrl + 0</code>) so you only see its section headings.</div>
 <h3>A taste of each kind of code (what it does, in simple words)</h3>
 
 <p><strong>Python cleaning rule:</strong> the same channel was typed 14 different ways. This maps them all to 4 standard names.</p>
@@ -295,10 +297,10 @@ Revenue YoY %  = DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )</pre></div>
   <li><b>Run the scripts in order</b><div class="code"><pre>python scripts\01_generate_data.py
 python scripts\02_inject_quality_issues.py
 python scripts\03_clean_data.py
-python scripts\04_build_charts.py
-python scripts\05_build_excel.py
-python scripts\06_build_presentation.py
-python scripts\07_build_powerbi_project.py</pre><button class="copy" type="button">Copy</button></div>Each one prints what it made. Because the data uses a fixed random seed, you get exactly the same numbers every time.</li>
+python scripts\helpers\build_charts.py
+python scripts\helpers\build_excel.py
+python scripts\helpers\build_presentation.py
+python scripts\helpers\build_powerbi_project.py</pre><button class="copy" type="button">Copy</button></div>Each one prints what it made. Because the data uses a fixed random seed, you get exactly the same numbers every time.</li>
 </ol>
 
 <!-- 6 -->

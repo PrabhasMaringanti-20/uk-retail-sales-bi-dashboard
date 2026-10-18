@@ -8,7 +8,7 @@ The dashboard mockups are rendered with matplotlib to show the intended layout.
 They are NOT Power BI screenshots - replace them with real screenshots once the
 .pbix is built (see powerbi/01_build_guide.md).
 
-Run:  python scripts/04_build_charts.py
+Run:  python scripts/helpers/build_charts.py
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter, PercentFormatter
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CLEAN = ROOT / "data" / "clean"
 OUT = ROOT / "screenshots"
 OUT.mkdir(exist_ok=True)

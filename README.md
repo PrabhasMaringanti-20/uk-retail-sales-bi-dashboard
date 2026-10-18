@@ -54,7 +54,7 @@ Date, Customer, Product, Store, Region, Channel. → [`documentation/data_model.
 | Folder | Contents |
 | --- | --- |
 | [`business-analysis/`](business-analysis/01_business_case.md) | Problem statement, objectives, scope, stakeholder map, KPI definitions |
-| [`scripts/`](scripts) | `01` generate data → `02` inject quality issues → `03` clean & model → `04` charts → `05` Excel → `06` deck → `07` Power BI Project · `run_pipeline.sh` |
+| [`scripts/`](scripts/README.md) | `01` generate data → `02` inject quality issues → `03` clean & model · `helpers/` build the charts, Excel, deck and Power BI files · `run_pipeline.sh` |
 | `data/` | `raw_data.zip`, `clean_data.zip` (or rebuild with the pipeline), injected-issue answer key, cleaning log |
 | [`documentation/`](documentation) | Data dictionary, data model, validation rules, data-quality report (before/after), quality scorecard |
 | [`sql/`](sql/README.md) | Schema with constraints, load, 13 data checks, **40 business questions with results and interpretation** |
@@ -65,6 +65,7 @@ Date, Customer, Product, Store, Region, Channel. → [`documentation/data_model.
 | [`insights/`](insights) | 10 insights (Finding → Evidence → Cause → Impact → Recommendation → Outcome), prioritised recommendations |
 | [`presentation/`](presentation) | 10-slide executive deck |
 | [`screenshots/`](screenshots) | Charts and dashboard page mockups |
+| [`CODE_GUIDE.md`](CODE_GUIDE.md) | **How to read and explain the code**: what matters, in what order |
 | [`notes/`](notes/00_START_HERE.md) | **Study notes for every phase** + interview question bank |
 | [`portfolio/`](portfolio/case_study_cv_linkedin.md) | Case study, CV bullets, LinkedIn post |
 
@@ -75,8 +76,8 @@ pip install pandas numpy matplotlib openpyxl python-pptx
 createdb northstar                     # PostgreSQL 14+
 bash scripts/run_pipeline.sh           # generate → break → clean → load → checks → zip
 psql -d northstar -f sql/04_business_questions.sql
-python scripts/04_build_charts.py && python scripts/05_build_excel.py && python scripts/06_build_presentation.py
-python scripts/07_build_powerbi_project.py   # regenerates the Power BI Project from the data + dax/measures.dax
+python scripts/helpers/build_charts.py && python scripts/helpers/build_excel.py && python scripts/helpers/build_presentation.py
+python scripts/helpers/build_powerbi_project.py   # regenerates the Power BI Project from the data + dax/measures.dax
 ```
 The generator is seeded, so every run produces identical data. **Reconciliation totals:** revenue £8,545,887.73 ·
 gross profit £3,595,003.75 · orders 89,528.
